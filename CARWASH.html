@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ultimi Pallet in Carwash</title>
+  <style>
+    body {
+      font-family: "Segoe UI", sans-serif;
+      background-color: white;
+      padding: 20px;
+      color: #333;
+      margin: 0;
+    }
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      margin-bottom: 20px;
+    }
+
+    .logo-left img {
+      height: 40px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 22px;
+      flex-grow: 1;
+      text-align: center;
+    }
+
+    .controls {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .controls img {
+      height: 30px;
+    }
+
+    .btn {
+      padding: 6px 10px;
+      border-radius: 6px;
+      border: none;
+      font-weight: bold;
+      cursor: pointer;
+      font-size: 14px;
+    }
+
+    .btn-export {
+      background-color: #4caf50;
+      color: white;
+    }
+
+    .btn-export:hover {
+      background-color: #388e3c;
+    }
+
+    .btn-dark {
+      background-color: #333;
+      color: white;
+    }
+
+    .btn-dark:hover {
+      background-color: #555;
+    }
+
+    .btn-home {
+      background-color: #1976d2;
+      color: white;
+    }
+
+    .btn-home:hover {
+      background-color: #0d47a1;
+    }
+
+    .filters {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 20px;
+      background: #e3f2fd;
+      padding: 10px;
+      border-radius: 6px;
+      align-items: flex-end;
+    }
+
+    .filter-group {
+      display: flex;
+      flex-direction: column;
+      font-size: 14px;
+      font-weight: bold;
+    }
+
+    .filter-group input,
+    .filter-group select {
+      font-weight: normal;
+      padding: 4px 6px;
+      border-radius: 4px;
+      border: 1px solid #ccc;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background-color: white;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+      font-size: 13px;
+    }
+
+    th, td {
+      border: 1px solid #ccc;
+      padding: 8px;
+      text-align: left;
+    }
+
+    th {
+      background-color: #3BB9FF;
+      text-transform: uppercase;
+    }
+
+    tbody tr.clickable-row {
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    tbody tr.clickable-row:hover {
+      background-color: #d0ebff;
+    }
+
+    .details {
+      background-color: #eef9ff;
+      font-size: 0.9em;
+      display: none;
+    }
+
+    .bold {
+      font-weight: bold;
+    }
+
+    body.dark {
+      background-color: #121212;
+      color: #eee;
+    }
+
+    body.dark table {
+      background-color: #1e1e1e;
+    }
+
+    body.dark th {
+      background-color: #333;
+      color: #fff;
+    }
+
+    body.dark td {
+      color: #ccc;
+    }
+
+    .highlighted {
+      background-color: #ffffcc;
+    }
+
+    @media screen and (max-width: 768px) {
+      h1 { font-size: 18px; }
+      th, td { font-size: 12px; padding: 6px; }
+      .controls { flex-direction: column; align-items: flex-start; }
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div class="logo-left">
+      <a href="index.html">
+        <img src="refresco_logo.jpg" alt="Logo">
+      </a>
+    </div>
+    <h1>Ultimi Pallet in Carwash</h1>
+    <div class="controls">
+      <a href="index.html" class="btn btn-home">Home</a>
+      <button id="dark-toggle" class="btn btn-dark">Modalità Scura</button>
+      <button id="export-btn" class="btn btn-export">Esporta</button>
+      <img src="Carwash.jpg" alt="Carwash Logo">
+    </div>
+  </div>
+
+  <div class="filters">
+    <div class="filter-group">
+      <label for="filter-date">Data inserimento da</label>
+      <input type="datetime-local" id="filter-date" />
+    </div>
+    <div class="filter-group">
+      <label for="filter-date-to">Data inserimento a</label>
+      <input type="datetime-local" id="filter-date-to" />
+    </div>
+    <div class="filter-group">
+      <label for="filter-lpn">LPN contiene</label>
+      <input type="text" id="filter-lpn" />
+    </div>
+    <div class="filter-group">
+      <label for="filter-location">Posizione</label>
+      <select id="filter-location">
+        <option value="">Tutte</option>
+        <option value="CW">CW</option>
+        <option value="CW_DOWN">CW_DOWN</option>
+      </select>
+    </div>
+    <div class="filter-group">
+      <label for="row-count">Mostra righe</label>
+      <select id="row-count">
+        <option value="10">10</option>
+        <option value="100">100</option>
+        <option value="500" selected>500</option>
+        <option value="1000">1000</option>
+      </select>
+    </div>
+  </div>
+
+  <div id="loading">Caricamento dati...</div>
+  <table id="data-table" style="display: none;">
+    <thead>
+      <tr>
+        <th>Data Inserimento</th>
+        <th>LPN</th>
+        <th>SKU</th>
+        <th>Descrizione</th>
+        <th>Motivazione</th>
+        <th>Quantità</th>
+      </tr>
+    </thead>
+    <tbody id="table-body"></tbody>
+  </table>
+  <div id="total-count" style="margin-top: 10px;"></div>
+
+  <audio id="alertSound" src="https://www.soundjay.com/button/sounds/beep-07.mp3" preload="auto"></audio>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
+  <script>
+    const supabaseUrl = 'https://orttbxpxuohxfsqwrzcy.supabase.co';
+    const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9ydHRieHB4dW9oeGZzcXdyemN5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA4NDAxMTksImV4cCI6MjA2NjQxNjExOX0.Lxe0r28sb4-JYRasIJJU13uq8sfiGSeNTeuWC98_wCs';
+    const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+
+    let allData = [];
+    let currentData = [];
+
+    async function loadData() {
+      const loading = document.getElementById('loading');
+      loading.innerText = 'Caricamento dati...';
+      document.getElementById('data-table').style.display = 'none';
+      document.getElementById('table-body').innerHTML = '';
+
+      const { data, error } = await supabase
+        .from('pallet_storico')
+        .select('*')
+        .order('EnterDateTime', { ascending: false });
+
+      if (error) {
+        loading.innerText = 'Errore: ' + error.message;
+        return;
+      }
+
+      allData = data;
+      applyFilters();
+    }
+
+    function applyFilters() {
+      let data = [...allData];
+
+      const dateFrom = document.getElementById('filter-date').value;
+      const dateTo = document.getElementById('filter-date-to').value;
+      const lpnFilter = document.getElementById('filter-lpn').value.trim().toLowerCase();
+      const locationFilter = document.getElementById('filter-location').value;
+      const rowCount = parseInt(document.getElementById('row-count').value);
+
+      if (dateFrom) {
+        data = data.filter(row => new Date(row.EnterDateTime) >= new Date(dateFrom));
+      }
+      if (dateTo) {
+        data = data.filter(row => new Date(row.EnterDateTime) <= new Date(dateTo));
+      }
+      if (lpnFilter) {
+        data = data.filter(row => (row.Lpn || '').toLowerCase().includes(lpnFilter));
+      }
+      if (locationFilter) {
+        data = data.filter(row => row.StorageLocation === locationFilter);
+      }
+
+      currentData = data.slice(0, rowCount);
+      renderTable(currentData);
+    }
+
+    function renderTable(data) {
+      const loading = document.getElementById('loading');
+      const tbody = document.getElementById('table-body');
+      tbody.innerHTML = '';
+
+      if (!data.length) {
+        loading.innerText = 'Nessun dato trovato.';
+        return;
+      }
+
+      data.forEach(row => {
+        const tr = document.createElement('tr');
+        tr.classList.add('clickable-row');
+        tr.innerHTML = `
+          <td>${formatDate(row.EnterDateTime)}</td>
+          <td class="bold">${row.Lpn}</td>
+          <td class="bold">${row.Sku}</td>
+          <td>${row.ItemDescription || '-'}</td>
+          <td>${row.Lot}</td>
+          <td>${row.Quantity}</td>
+        `;
+
+        const detailRow = document.createElement('tr');
+        detailRow.classList.add('details');
+        detailRow.style.display = 'none';
+        detailRow.innerHTML = `
+          <td colspan="6">
+            Altezza: ${row.Height ?? '-'} ${row.ItemHeight ? `(${row.ItemHeight})` : ''} 
+            Lunghezza: ${row.Length ?? '-'} ${row.ItemLength ? `(${row.ItemLength})` : ''} 
+            Larghezza: ${row.Width ?? '-'} ${row.ItemWidth ? `(${row.ItemWidth})` : ''} 
+            Peso: ${row.Weight ?? '-'} ${row.ItemWeight ? `(${row.ItemWeight})` : ''} <br>
+            <strong>LPN2:</strong> ${row.Lpn2 || '-'} |
+            <strong>Tipo:</strong> ${row.LoadAid || '-'}
+          </td>
+        `;
+
+        tr.addEventListener('click', () => {
+          detailRow.style.display = detailRow.style.display === 'table-row' ? 'none' : 'table-row';
+        });
+
+        tbody.appendChild(tr);
+        tbody.appendChild(detailRow);
+      });
+
+      loading.style.display = 'none';
+      document.getElementById('data-table').style.display = 'table';
+      document.getElementById('total-count').innerText = `Totale righe visualizzate: ${data.length}`;
+    }
+
+    function exportToExcel() {
+      const rows = currentData.map(row => ({
+        'Data Inserimento': formatDate(row.EnterDateTime),
+        'LPN': row.Lpn,
+        'SKU': row.Sku,
+        'Descrizione': row.ItemDescription || '-',
+        'Motivazione': row.Lot,
+        'Quantità': row.Quantity,
+        'Alt. Misurata': row.Height || '-',
+        'Lun. Misurata': row.Length || '-',
+        'Largh. Misurata': row.Width || '-',
+        'Peso Misurato': row.Weight || '-',
+        'Alt. Prevista': row.ItemHeight || '-',
+        'Lun. Prevista': row.ItemLength || '-',
+        'Largh. Prevista': row.ItemWidth || '-',
+        'Peso Previsto': row.ItemWeight || '-',
+        'LPN2': row.Lpn2 || '-',
+        'Tipo': row.LoadAid || '-'
+      }));
+
+      const worksheet = XLSX.utils.json_to_sheet(rows);
+      const workbook = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(workbook, worksheet, "Pallet Carwash");
+      XLSX.writeFile(workbook, "pallet_carwash.xlsx");
+    }
+
+    function formatDate(datetimeStr) {
+      const d = new Date(datetimeStr);
+      return d.toLocaleString("it-IT");
+    }
+
+    function toggleDarkMode() {
+      document.body.classList.toggle("dark");
+      localStorage.setItem("darkMode", document.body.classList.contains("dark"));
+    }
+
+    if (localStorage.getItem("darkMode") === "true") {
+      document.body.classList.add("dark");
+    }
+
+    document.getElementById('filter-date').addEventListener('change', applyFilters);
+    document.getElementById('filter-date-to').addEventListener('change', applyFilters);
+    document.getElementById('filter-lpn').addEventListener('input', applyFilters);
+    document.getElementById('filter-location').addEventListener('change', applyFilters);
+    document.getElementById('row-count').addEventListener('change', applyFilters);
+    document.getElementById('export-btn').addEventListener('click', exportToExcel);
+    document.getElementById('dark-toggle').addEventListener('click', toggleDarkMode);
+
+    loadData();
+    setInterval(loadData, 60000);
+  </script>
+</body>
+</html>
