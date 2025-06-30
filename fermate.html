@@ -4,12 +4,18 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Fermi Attivi - LGV & Dorsali</title>
+
+  <link rel="icon" href="refresco_logo.jpg" type="image/jpg">
+  <link rel="apple-touch-icon" href="refresco_logo.jpg">
+  <meta name="theme-color" content="#3BB9FF">
+  <link rel="manifest" href="manifest.json">
+
   <style>
     body {
       font-family: "Segoe UI", sans-serif;
       background-color: white;
       margin: 0;
-      padding: 0 20px 20px 20px;
+      padding: 0 10px 20px 10px;
       color: #333;
     }
 
@@ -52,10 +58,11 @@
     .controls {
       display: flex;
       gap: 10px;
+      flex-wrap: wrap;
     }
 
     .btn {
-      padding: 6px 10px;
+      padding: 8px 12px;
       border-radius: 6px;
       border: none;
       font-weight: bold;
@@ -90,11 +97,16 @@
       background-color: #1976d2;
     }
 
+    .table-container {
+      overflow-x: auto;
+    }
+
     table {
       width: 100%;
       border-collapse: collapse;
       background-color: white;
       box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+      min-width: 700px;
     }
 
     th, td {
@@ -107,6 +119,7 @@
     th {
       background-color: #3BB9FF;
       text-transform: uppercase;
+      color: white;
     }
 
     .bold { font-weight: bold; }
@@ -142,9 +155,19 @@
     }
 
     @media screen and (max-width: 768px) {
-      .logo-title h1 { font-size: 18px; }
-      th, td { font-size: 12px; padding: 6px; }
-      .controls { flex-direction: column; align-items: flex-end; }
+      .logo-title img {
+        height: 30px;
+      }
+      .logo-title h1 {
+        font-size: 18px;
+      }
+      th, td {
+        font-size: 12px;
+        padding: 6px;
+      }
+      .controls {
+        justify-content: center;
+      }
     }
   </style>
 </head>
@@ -157,41 +180,37 @@
 
   <!-- Header principale -->
   <div class="header">
-    <!-- Logo e Titolo -->
     <div class="logo-title">
       <img src="refresco_logo.jpg" alt="Logo Refresco">
       <h1>Fermi Attivi - LGV & Dorsali</h1>
     </div>
-
-    <!-- Pulsanti -->
     <div class="controls">
-      <a href="index.html" class="btn btn-home">Menù</a>
+      <a href="index.html" class="btn btn-home">Home</a>
       <button id="export-btn" class="btn btn-export">Esporta</button>
       <button id="dark-toggle" class="btn btn-dark">Modalità Scura</button>
     </div>
   </div>
 
-  <!-- Resto della pagina... -->
   <div id="loading">Caricamento dati...</div>
-  <table id="data-table" style="display:none;">
-    <thead>
-      <tr>
-        <th>INIZIO FERMATA</th>
-        <th>MACCHINA</th>
-        <th>DESCRIZIONE FERMATA</th>
-        <th>DETTAGLIO FERMATA</th>
-        <th>CATEGORIA</th>
-        <th>DURATA FERMO</th>
-        <th>GRUPPO</th>
-      </tr>
-    </thead>
-    <tbody id="table-body"></tbody>
-  </table>
-  <div id="total-count"></div>
 
-  <audio id="notify-sound" preload="auto">
-    <source src="data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAESsAACJWAAACABAAZGF0YQAAAAA=" type="audio/wav">
-  </audio>
+  <div class="table-container">
+    <table id="data-table" style="display:none;">
+      <thead>
+        <tr>
+          <th>INIZIO FERMATA</th>
+          <th>MACCHINA</th>
+          <th>DESCRIZIONE FERMATA</th>
+          <th>DETTAGLIO FERMATA</th>
+          <th>CATEGORIA</th>
+          <th>DURATA FERMO</th>
+          <th>GRUPPO</th>
+        </tr>
+      </thead>
+      <tbody id="table-body"></tbody>
+    </table>
+  </div>
+
+  <div id="total-count"></div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -212,20 +231,6 @@
       return row.StartDate + "_" + row.Dorsale;
     }
 
-    function playNotification() {
-      const audio = document.getElementById('notify-sound');
-      audio.play().catch(() => {});
-    }
-
-    function showDesktopNotification() {
-      if (Notification.permission === "granted") {
-        new Notification("Nuovi fermi rilevati!", {
-          body: "Ci sono nuove righe nella tabella.",
-          icon: "https://cdn-icons-png.flaticon.com/512/1827/1827401.png"
-        });
-      }
-    }
-
     async function loadData() {
       document.getElementById('loading').innerText = 'Caricamento dati...';
       document.getElementById('data-table').style.display = 'none';
@@ -238,16 +243,18 @@
         .order('Dorsale', { ascending: true });
 
       if (error) {
+        console.error("Supabase error:", error);
         document.getElementById('loading').innerText = 'Errore: ' + error.message;
         return;
       }
+
+      console.log("Supabase data:", data);
 
       const newKeys = data.map(getKey);
       const hasChanges = JSON.stringify(newKeys) !== JSON.stringify(lastDataKeys);
 
       if (hasChanges) {
-        playNotification();
-        showDesktopNotification();
+        console.log("Nuovi dati rilevati!");
         document.getElementById('data-table').classList.add('notify-border');
         setTimeout(() => {
           document.getElementById('data-table').classList.remove('notify-border');
@@ -304,10 +311,6 @@
 
     if (localStorage.getItem("darkMode") === "true") {
       document.body.classList.add("dark");
-    }
-
-    if (Notification.permission !== "granted") {
-      Notification.requestPermission();
     }
 
     document.getElementById('export-btn').addEventListener('click', exportToExcel);

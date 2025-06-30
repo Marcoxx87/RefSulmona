@@ -4,41 +4,52 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Dashboard LGV</title>
+
+  <!-- Favicon e icona app -->
+  <link rel="icon" href="refresco_logo.jpg" type="image/jpg">
+  <link rel="apple-touch-icon" href="refresco_logo.jpg">
+  <meta name="theme-color" content="#3BB9FF">
+  <link rel="manifest" href="manifest.json">
+
   <style>
     body {
       font-family: "Segoe UI", sans-serif;
       background-color: #f9f9f9;
       margin: 0;
       color: #333;
+      position: relative;
+      min-height: 100vh;
+      padding-bottom: 60px; /* spazio per bottoni in basso */
     }
 
     header {
       display: flex;
+      flex-wrap: wrap;
       justify-content: center;
       align-items: center;
-      padding: 20px 30px;
+      gap: 20px;
+      padding: 20px;
       background: linear-gradient(to right, #3BB9FF, #007bbd);
       position: relative;
     }
 
     header h1 {
       margin: 0;
-      font-size: 36px;
+      font-size: 30px;
       color: white;
       text-align: center;
-      flex: 1;
+      flex-grow: 1;
     }
 
-    header .logo-container {
-      position: absolute;
-      right: 30px;
+    .logo-container {
       background-color: white;
-      padding: 8px 12px;
+      padding: 6px 10px;
       border-radius: 8px;
+      flex-shrink: 0;
     }
 
     header img {
-      height: 50px;
+      height: 45px;
       object-fit: contain;
     }
 
@@ -103,13 +114,58 @@
       margin-top: 40px;
     }
 
+    .small-links {
+      position: fixed;
+      bottom: 10px;
+      left: 0;
+      right: 0;
+      display: flex;
+      justify-content: space-between;
+      padding: 0 20px;
+      pointer-events: none;
+    }
+
+    .small-links a {
+      pointer-events: all;
+      font-size: 12px;
+      color: #007bbd;
+      background-color: #e3f2fd;
+      padding: 6px 12px;
+      border-radius: 6px;
+      text-decoration: none;
+      font-weight: bold;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+      transition: background-color 0.3s, color 0.3s;
+    }
+
+    .small-links a:hover {
+      background-color: #007bbd;
+      color: #fff;
+    }
+
     @media screen and (min-width: 700px) {
+      header {
+        justify-content: space-between;
+      }
+      header h1 {
+        text-align: left;
+        font-size: 36px;
+      }
       .btn-container {
         flex-direction: row;
         justify-content: center;
       }
       .nav-btn {
         width: 250px;
+      }
+    }
+
+    @media screen and (max-width: 699px) {
+      header {
+        flex-direction: column;
+      }
+      header h1 {
+        font-size: 24px;
       }
     }
   </style>
@@ -123,7 +179,6 @@
   </header>
 
   <div class="container">
- 
     <div class="btn-container">
       <a href="fermate.html" id="fermate-btn" class="nav-btn">
         Fermate Attive <span id="fermate-badge" class="badge" style="display: none;">0</span>
@@ -133,6 +188,11 @@
     </div>
 
     <div id="clock" class="clock"></div>
+  </div>
+
+  <div class="small-links">
+    <a href="https://refresco.sharepoint.com/sites/ITA-MFG-Action-Plan_Sulmona/Lists/Action%20Plan%20Sulmona/AllItems.aspx" target="_blank">Action Plan</a>
+    <a href="https://refresco.sharepoint.com/sites/ITA-MFG-Action-Plan_Sulmona/Lists/Malfunzionamenti%20Magazzino/AllItems.aspx" target="_blank">Magazzino Automatico</a>
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>

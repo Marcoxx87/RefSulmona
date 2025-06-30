@@ -1,0 +1,22 @@
+{
+  "name": "Refresco Dashboard",
+  "short_name": "Dashboard",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#f9f9f9",
+  "theme_color": "#3BB9FF",
+  "description": "Dashboard LGV Refresco per controllo fermate, locazioni bloccate e carwash",
+  "icons": [
+    {
+      "src": "refresco_logo.jpg",
+      "sizes": "192x192",
+      "type": "image/jpg"
+    },
+    {
+      "src": "refresco_logo.jpg",
+      "sizes": "512x512",
+      "type": "image/jpg"
+    }
+  ],
+  "lang": "it"
+}

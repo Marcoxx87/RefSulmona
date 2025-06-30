@@ -4,13 +4,20 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Ultimi Pallet in Carwash</title>
+
+  <!-- Favicon e icona app -->
+  <link rel="icon" href="refresco_logo.jpg" type="image/jpg">
+  <link rel="apple-touch-icon" href="refresco_logo.jpg">
+  <meta name="theme-color" content="#3BB9FF">
+  <link rel="manifest" href="manifest.json">
+
   <style>
     body {
       font-family: "Segoe UI", sans-serif;
       background-color: white;
-      padding: 20px;
       color: #333;
       margin: 0;
+      padding: 0 10px 20px 10px;
     }
 
     .header {
@@ -35,7 +42,8 @@
     .controls {
       display: flex;
       gap: 10px;
-      align-items: center;
+      flex-wrap: wrap;
+      justify-content: flex-end;
     }
 
     .controls img {
@@ -43,7 +51,7 @@
     }
 
     .btn {
-      padding: 6px 10px;
+      padding: 8px 12px;
       border-radius: 6px;
       border: none;
       font-weight: bold;
@@ -81,12 +89,11 @@
     .filters {
       display: flex;
       flex-wrap: wrap;
-      gap: 10px;
+      gap: 15px;
       margin-bottom: 20px;
       background: #e3f2fd;
       padding: 10px;
-      border-radius: 6px;
-      align-items: flex-end;
+      border-radius: 8px;
     }
 
     .filter-group {
@@ -94,22 +101,32 @@
       flex-direction: column;
       font-size: 14px;
       font-weight: bold;
+      color: #0d47a1;
+      min-width: 160px;
+      flex: 1;
     }
 
     .filter-group input,
     .filter-group select {
       font-weight: normal;
-      padding: 4px 6px;
+      padding: 6px;
       border-radius: 4px;
-      border: 1px solid #ccc;
+      border: 1px solid #90caf9;
+      background-color: #fff;
+    }
+
+    .table-container {
+      overflow-x: auto;
     }
 
     table {
       width: 100%;
       border-collapse: collapse;
-      background-color: white;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+      margin-top: 10px;
       font-size: 13px;
+      background-color: #fff;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+      min-width: 800px;
     }
 
     th, td {
@@ -121,6 +138,7 @@
     th {
       background-color: #3BB9FF;
       text-transform: uppercase;
+      color: #fff;
     }
 
     tbody tr.clickable-row {
@@ -160,14 +178,38 @@
       color: #ccc;
     }
 
-    .highlighted {
-      background-color: #ffffcc;
+    body.dark .filters {
+      background-color: #333;
+      color: #fff;
+    }
+
+    body.dark .filter-group input,
+    body.dark .filter-group select {
+      background-color: #555;
+      color: #fff;
+      border-color: #777;
     }
 
     @media screen and (max-width: 768px) {
-      h1 { font-size: 18px; }
-      th, td { font-size: 12px; padding: 6px; }
-      .controls { flex-direction: column; align-items: flex-start; }
+      .logo-left img {
+        height: 30px;
+      }
+      h1 {
+        font-size: 18px;
+      }
+      th, td {
+        font-size: 12px;
+        padding: 6px;
+      }
+      .controls {
+        justify-content: center;
+      }
+      .filters {
+        flex-direction: column;
+      }
+      .filter-group {
+        width: 100%;
+      }
     }
   </style>
 </head>
@@ -220,22 +262,25 @@
   </div>
 
   <div id="loading">Caricamento dati...</div>
-  <table id="data-table" style="display: none;">
-    <thead>
-      <tr>
-        <th>Data Inserimento</th>
-        <th>LPN</th>
-        <th>SKU</th>
-        <th>Descrizione</th>
-        <th>Motivazione</th>
-        <th>Quantità</th>
-      </tr>
-    </thead>
-    <tbody id="table-body"></tbody>
-  </table>
+
+  <div class="table-container">
+    <table id="data-table" style="display: none;">
+      <thead>
+        <tr>
+          <th>Data Inserimento</th>
+          <th>LPN</th>
+          <th>SKU</th>
+          <th>Descrizione</th>
+          <th>Motivazione</th>
+          <th>Quantità</th>
+        </tr>
+      </thead>
+      <tbody id="table-body"></tbody>
+    </table>
+  </div>
+
   <div id="total-count" style="margin-top: 10px;"></div>
 
-  <audio id="alertSound" src="https://www.soundjay.com/button/sounds/beep-07.mp3" preload="auto"></audio>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
@@ -248,8 +293,7 @@
     let currentData = [];
 
     async function loadData() {
-      const loading = document.getElementById('loading');
-      loading.innerText = 'Caricamento dati...';
+      document.getElementById('loading').innerText = 'Caricamento dati...';
       document.getElementById('data-table').style.display = 'none';
       document.getElementById('table-body').innerHTML = '';
 
@@ -259,7 +303,7 @@
         .order('EnterDateTime', { ascending: false });
 
       if (error) {
-        loading.innerText = 'Errore: ' + error.message;
+        document.getElementById('loading').innerText = 'Errore: ' + error.message;
         return;
       }
 

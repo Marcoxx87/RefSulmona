@@ -1,16 +1,23 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Stato Magazzino</title>
+  <title>Stato Locazioni Magazzino</title>
+
+  <!-- Favicon e icona app -->
+  <link rel="icon" href="refresco_logo.jpg" type="image/jpg">
+  <link rel="apple-touch-icon" href="refresco_logo.jpg">
+  <meta name="theme-color" content="#3BB9FF">
+  <link rel="manifest" href="manifest.json">
+
   <style>
     body {
       font-family: "Segoe UI", sans-serif;
       background-color: white;
       color: #333;
       margin: 0;
-      padding: 0 20px 20px 20px;
+      padding: 0 10px 20px 10px;
     }
 
     .top-bar {
@@ -52,10 +59,11 @@
     .controls {
       display: flex;
       gap: 10px;
+      flex-wrap: wrap;
     }
 
     .btn {
-      padding: 6px 10px;
+      padding: 8px 12px;
       border-radius: 6px;
       border: none;
       font-weight: bold;
@@ -107,6 +115,7 @@
       font-weight: bold;
       color: #0d47a1;
       min-width: 160px;
+      flex: 1;
     }
 
     .filter-group label {
@@ -122,6 +131,10 @@
       background-color: #fff;
     }
 
+    .table-container {
+      overflow-x: auto;
+    }
+
     table {
       width: 100%;
       border-collapse: collapse;
@@ -129,11 +142,13 @@
       font-size: 13px;
       background-color: #fff;
       box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+      min-width: 800px;
     }
 
     th, td {
       border: 1px solid #ccc;
       padding: 6px;
+      text-align: left;
     }
 
     th {
@@ -177,23 +192,37 @@
     }
 
     @media screen and (max-width: 768px) {
-      .logo-title h1 { font-size: 18px; }
-      th, td { font-size: 12px; padding: 6px; }
-      .controls { flex-direction: column; align-items: flex-end; }
-      .filters { flex-direction: column; }
-      .filter-group { width: 100%; }
+      .logo-title img {
+        height: 30px;
+      }
+      .logo-title h1 {
+        font-size: 18px;
+      }
+      th, td {
+        font-size: 12px;
+        padding: 6px;
+      }
+      .controls {
+        justify-content: center;
+      }
+      .filters {
+        flex-direction: column;
+      }
+      .filter-group {
+        width: 100%;
+      }
     }
   </style>
 </head>
 <body>
 
   <div class="top-bar">
-    <img src="locazione.jpg" alt="Logo Fermata" />
+    <img src="Locazione.jpg" alt="Logo Locazione" />
   </div>
 
   <div class="header">
     <div class="logo-title">
-      <img src="refresco_logo.jpg" alt="Logo Refresco" />
+      <img src="refresco_logo.jpg" alt="Logo Refresco">
       <h1>Stato Locazioni Bloccate Magazzino Automatico</h1>
     </div>
     <div class="controls">
@@ -235,22 +264,26 @@
   </div>
 
   <div id="loading">Caricamento dati...</div>
-  <table id="data-table" style="display: none;">
-    <thead>
-      <tr>
-        <th>Luogo</th>
-        <th>Locazione</th>
-        <th>Prelievo Disabilitato</th>
-        <th>Deposito Disabilitato</th>
-        <th>Motivazione</th>
-        <th>Codice Articolo</th>
-        <th>Descrizione Articolo</th>
-        <th>Quantità Presente</th>
-        <th>Ultimo Aggiornamento</th>
-      </tr>
-    </thead>
-    <tbody id="table-body"></tbody>
-  </table>
+
+  <div class="table-container">
+    <table id="data-table" style="display: none;">
+      <thead>
+        <tr>
+          <th>Luogo</th>
+          <th>Locazione</th>
+          <th>Prelievo Disabilitato</th>
+          <th>Deposito Disabilitato</th>
+          <th>Motivazione</th>
+          <th>Codice Articolo</th>
+          <th>Descrizione Articolo</th>
+          <th>Quantità Presente</th>
+          <th>Ultimo Aggiornamento</th>
+        </tr>
+      </thead>
+      <tbody id="table-body"></tbody>
+    </table>
+  </div>
+
   <div id="total-count"></div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -287,15 +320,12 @@
       if (luogo) {
         data = data.filter(row => (row.LUOGO || '').toLowerCase().includes(luogo));
       }
-
       if (locazione) {
         data = data.filter(row => (row.LOCAZIONE || '').toLowerCase().includes(locazione));
       }
-
       if (prelievoDis !== '') {
         data = data.filter(row => String(row.PRELIEVO_DISABILITATO) === prelievoDis);
       }
-
       if (depositoDis !== '') {
         data = data.filter(row => String(row.DEPOSITO_DISABILITATO) === depositoDis);
       }
@@ -321,10 +351,6 @@
           <td>${row.QTA_PRESENTE ?? '-'}</td>
           <td>${row.updated_at ? new Date(row.updated_at).toLocaleString() : '-'}</td>
         `;
-        tr.addEventListener('click', () => {
-          document.querySelectorAll('tr').forEach(r => r.classList.remove('highlighted'));
-          tr.classList.add('highlighted');
-        });
         tbody.appendChild(tr);
       });
 
