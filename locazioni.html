@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Stato Magazzino</title>
+  <style>
+    body {
+      font-family: "Segoe UI", sans-serif;
+      background-color: white;
+      color: #333;
+      margin: 0;
+      padding: 0 20px 20px 20px;
+    }
+
+    .top-bar {
+      display: flex;
+      justify-content: flex-end;
+      padding: 5px;
+    }
+
+    .top-bar img {
+      height: 30px;
+    }
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      margin-bottom: 20px;
+    }
+
+    .logo-title {
+      display: flex;
+      align-items: center;
+      flex: 1;
+    }
+
+    .logo-title img {
+      height: 40px;
+      margin-right: 15px;
+    }
+
+    .logo-title h1 {
+      font-size: 22px;
+      margin: 0;
+      text-align: center;
+      flex: 1;
+    }
+
+    .controls {
+      display: flex;
+      gap: 10px;
+    }
+
+    .btn {
+      padding: 6px 10px;
+      border-radius: 6px;
+      border: none;
+      font-weight: bold;
+      cursor: pointer;
+      font-size: 14px;
+    }
+
+    .btn-export {
+      background-color: #4caf50;
+      color: white;
+    }
+
+    .btn-export:hover {
+      background-color: #388e3c;
+    }
+
+    .btn-home {
+      background-color: #2196f3;
+      color: white;
+    }
+
+    .btn-home:hover {
+      background-color: #1976d2;
+    }
+
+    .btn-dark {
+      background-color: #333;
+      color: white;
+    }
+
+    .btn-dark:hover {
+      background-color: #555;
+    }
+
+    .filters {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 15px;
+      margin-bottom: 20px;
+      background-color: #e3f2fd;
+      padding: 10px;
+      border-radius: 8px;
+    }
+
+    .filter-group {
+      display: flex;
+      flex-direction: column;
+      font-size: 14px;
+      font-weight: bold;
+      color: #0d47a1;
+      min-width: 160px;
+    }
+
+    .filter-group label {
+      margin-bottom: 2px;
+    }
+
+    .filter-group input,
+    .filter-group select {
+      font-weight: normal;
+      padding: 6px;
+      border-radius: 4px;
+      border: 1px solid #90caf9;
+      background-color: #fff;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+      font-size: 13px;
+      background-color: #fff;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+    }
+
+    th, td {
+      border: 1px solid #ccc;
+      padding: 6px;
+    }
+
+    th {
+      background-color: #3BB9FF;
+      text-transform: uppercase;
+      color: #fff;
+    }
+
+    tr:hover {
+      background-color: #ffffcc;
+    }
+
+    #total-count {
+      margin-top: 10px;
+      font-weight: bold;
+    }
+
+    body.dark {
+      background-color: #121212;
+      color: #eee;
+    }
+    body.dark table {
+      background-color: #1e1e1e;
+    }
+    body.dark th {
+      background-color: #333;
+      color: #fff;
+    }
+    body.dark td {
+      color: #ccc;
+    }
+    body.dark .filters {
+      background-color: #333;
+      color: #fff;
+    }
+    body.dark .filter-group input,
+    body.dark .filter-group select {
+      background-color: #555;
+      color: #fff;
+      border-color: #777;
+    }
+
+    @media screen and (max-width: 768px) {
+      .logo-title h1 { font-size: 18px; }
+      th, td { font-size: 12px; padding: 6px; }
+      .controls { flex-direction: column; align-items: flex-end; }
+      .filters { flex-direction: column; }
+      .filter-group { width: 100%; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="top-bar">
+    <img src="Locazione.jpg" alt="Logo Fermata" />
+  </div>
+
+  <div class="header">
+    <div class="logo-title">
+      <img src="refresco_logo.jpg" alt="Logo Refresco" />
+      <h1>Stato Locazioni Bloccate Magazzino Automatico</h1>
+    </div>
+    <div class="controls">
+      <a href="index.html" class="btn btn-home">Home</a>
+      <button id="export-btn" class="btn btn-export">Esporta</button>
+      <button id="dark-toggle" class="btn btn-dark">Modalità Scura</button>
+    </div>
+  </div>
+
+  <div class="filters">
+    <div class="filter-group">
+      <label for="filter-luogo">Luogo</label>
+      <select id="filter-luogo">
+        <option value="">Tutti</option>
+        <option value="WHS">WHS</option>
+        <option value="CRANE">CRANE</option>
+      </select>
+    </div>
+    <div class="filter-group">
+      <label for="filter-locazione">Locazione</label>
+      <input type="text" id="filter-locazione" placeholder="Es. CR1.r.024.06">
+    </div>
+    <div class="filter-group">
+      <label for="filter-prelievo">Prelievo Disabilitato</label>
+      <select id="filter-prelievo">
+        <option value="">Tutti</option>
+        <option value="true">Sì</option>
+        <option value="false">No</option>
+      </select>
+    </div>
+    <div class="filter-group">
+      <label for="filter-deposito">Deposito Disabilitato</label>
+      <select id="filter-deposito">
+        <option value="">Tutti</option>
+        <option value="true">Sì</option>
+        <option value="false">No</option>
+      </select>
+    </div>
+  </div>
+
+  <div id="loading">Caricamento dati...</div>
+  <table id="data-table" style="display: none;">
+    <thead>
+      <tr>
+        <th>Luogo</th>
+        <th>Locazione</th>
+        <th>Prelievo Disabilitato</th>
+        <th>Deposito Disabilitato</th>
+        <th>Motivazione</th>
+        <th>Codice Articolo</th>
+        <th>Descrizione Articolo</th>
+        <th>Quantità Presente</th>
+        <th>Ultimo Aggiornamento</th>
+      </tr>
+    </thead>
+    <tbody id="table-body"></tbody>
+  </table>
+  <div id="total-count"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <script>
+    const supabase = window.supabase.createClient(
+      'https://orttbxpxuohxfsqwrzcy.supabase.co',
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9ydHRieHB4dW9oeGZzcXdyemN5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA4NDAxMTksImV4cCI6MjA2NjQxNjExOX0.Lxe0r28sb4-JYRasIJJU13uq8sfiGSeNTeuWC98_wCs'
+    );
+
+    let currentData = [];
+
+    async function loadData() {
+      document.getElementById('loading').innerText = 'Caricamento dati...';
+      document.getElementById('data-table').style.display = 'none';
+      document.getElementById('table-body').innerHTML = '';
+
+      const luogo = document.getElementById('filter-luogo').value.toLowerCase().trim();
+      const locazione = document.getElementById('filter-locazione').value.toLowerCase().trim();
+      const prelievoDis = document.getElementById('filter-prelievo').value;
+      const depositoDis = document.getElementById('filter-deposito').value;
+
+      let { data, error } = await supabase
+        .from('magazzino_stato')
+        .select('*')
+        .order('LUOGO', { ascending: false })
+        .order('LOCAZIONE', { ascending: true });
+
+      if (error) {
+        document.getElementById('loading').innerText = 'Errore: ' + error.message;
+        return;
+      }
+
+      if (luogo) {
+        data = data.filter(row => (row.LUOGO || '').toLowerCase().includes(luogo));
+      }
+
+      if (locazione) {
+        data = data.filter(row => (row.LOCAZIONE || '').toLowerCase().includes(locazione));
+      }
+
+      if (prelievoDis !== '') {
+        data = data.filter(row => String(row.PRELIEVO_DISABILITATO) === prelievoDis);
+      }
+
+      if (depositoDis !== '') {
+        data = data.filter(row => String(row.DEPOSITO_DISABILITATO) === depositoDis);
+      }
+
+      currentData = data;
+
+      if (!data.length) {
+        document.getElementById('loading').innerText = 'Nessun dato trovato.';
+        return;
+      }
+
+      const tbody = document.getElementById('table-body');
+      data.forEach(row => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${row.LUOGO || '-'}</td>
+          <td>${row.LOCAZIONE || '-'}</td>
+          <td>${row.PRELIEVO_DISABILITATO ? 'Sì' : 'No'}</td>
+          <td>${row.DEPOSITO_DISABILITATO ? 'Sì' : 'No'}</td>
+          <td>${row.MOTIVAZIONE || '-'}</td>
+          <td>${row.COD_ARTICOLO || '-'}</td>
+          <td>${row.DESC_ARTICOLO || '-'}</td>
+          <td>${row.QTA_PRESENTE ?? '-'}</td>
+          <td>${row.updated_at ? new Date(row.updated_at).toLocaleString() : '-'}</td>
+        `;
+        tr.addEventListener('click', () => {
+          document.querySelectorAll('tr').forEach(r => r.classList.remove('highlighted'));
+          tr.classList.add('highlighted');
+        });
+        tbody.appendChild(tr);
+      });
+
+      document.getElementById('loading').style.display = 'none';
+      document.getElementById('data-table').style.display = 'table';
+      document.getElementById('total-count').innerText = `Totale righe visualizzate: ${data.length}`;
+    }
+
+    function exportToExcel() {
+      const rows = currentData.map(row => ({
+        'Luogo': row.LUOGO,
+        'Locazione': row.LOCAZIONE,
+        'Prelievo Disabilitato': row.PRELIEVO_DISABILITATO ? 'Sì' : 'No',
+        'Deposito Disabilitato': row.DEPOSITO_DISABILITATO ? 'Sì' : 'No',
+        'Motivazione': row.MOTIVAZIONE,
+        'Codice Articolo': row.COD_ARTICOLO,
+        'Descrizione Articolo': row.DESC_ARTICOLO,
+        'Quantità Presente': row.QTA_PRESENTE,
+        'Ultimo Aggiornamento': row.updated_at ? new Date(row.updated_at).toLocaleString() : ''
+      }));
+
+      const worksheet = XLSX.utils.json_to_sheet(rows);
+      const workbook = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(workbook, worksheet, "Magazzino");
+      XLSX.writeFile(workbook, "magazzino_stato_completo.xlsx");
+    }
+
+    function toggleDarkMode() {
+      document.body.classList.toggle("dark");
+      localStorage.setItem("darkMode", document.body.classList.contains("dark"));
+    }
+
+    if (localStorage.getItem("darkMode") === "true") {
+      document.body.classList.add("dark");
+    }
+
+    document.getElementById('filter-luogo').addEventListener('input', loadData);
+    document.getElementById('filter-locazione').addEventListener('input', loadData);
+    document.getElementById('filter-prelievo').addEventListener('change', loadData);
+    document.getElementById('filter-deposito').addEventListener('change', loadData);
+    document.getElementById('export-btn').addEventListener('click', exportToExcel);
+    document.getElementById('dark-toggle').addEventListener('click', toggleDarkMode);
+
+    loadData();
+    setInterval(loadData, 60000);
+  </script>
+</body>
+</html>

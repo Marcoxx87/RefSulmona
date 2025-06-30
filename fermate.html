@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Fermi Attivi - LGV & Dorsali</title>
+  <style>
+    body {
+      font-family: "Segoe UI", sans-serif;
+      background-color: white;
+      margin: 0;
+      padding: 0 20px 20px 20px;
+      color: #333;
+    }
+
+    .top-bar {
+      display: flex;
+      justify-content: flex-end;
+      padding: 5px;
+    }
+
+    .top-bar img {
+      height: 30px;
+    }
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      margin-bottom: 20px;
+    }
+
+    .logo-title {
+      display: flex;
+      align-items: center;
+      flex: 1;
+    }
+
+    .logo-title img {
+      height: 40px;
+      margin-right: 15px;
+    }
+
+    .logo-title h1 {
+      font-size: 22px;
+      margin: 0;
+      text-align: center;
+      flex: 1;
+    }
+
+    .controls {
+      display: flex;
+      gap: 10px;
+    }
+
+    .btn {
+      padding: 6px 10px;
+      border-radius: 6px;
+      border: none;
+      font-weight: bold;
+      cursor: pointer;
+      font-size: 14px;
+    }
+
+    .btn-export {
+      background-color: #4caf50;
+      color: white;
+    }
+
+    .btn-export:hover {
+      background-color: #388e3c;
+    }
+
+    .btn-dark {
+      background-color: #333;
+      color: white;
+    }
+
+    .btn-dark:hover {
+      background-color: #555;
+    }
+
+    .btn-home {
+      background-color: #2196f3;
+      color: white;
+    }
+
+    .btn-home:hover {
+      background-color: #1976d2;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background-color: white;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+    }
+
+    th, td {
+      padding: 10px;
+      border-bottom: 1px solid #ddd;
+      text-align: left;
+      font-size: 14px;
+    }
+
+    th {
+      background-color: #3BB9FF;
+      text-transform: uppercase;
+    }
+
+    .bold { font-weight: bold; }
+    .row-danger { background-color: #ffebee !important; }
+
+    #total-count {
+      margin-top: 15px;
+      font-weight: bold;
+    }
+
+    .notify-border {
+      animation: notify-blink 1s ease-in-out 4;
+    }
+
+    @keyframes notify-blink {
+      0%, 100% { border: 3px solid #f00; }
+      50% { border: 3px solid #fff; }
+    }
+
+    body.dark {
+      background-color: #121212;
+      color: #eee;
+    }
+    body.dark table {
+      background-color: #1e1e1e;
+    }
+    body.dark th {
+      background-color: #333;
+      color: #fff;
+    }
+    body.dark td {
+      color: #ccc;
+    }
+
+    @media screen and (max-width: 768px) {
+      .logo-title h1 { font-size: 18px; }
+      th, td { font-size: 12px; padding: 6px; }
+      .controls { flex-direction: column; align-items: flex-end; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Logo piccolo in alto a destra -->
+  <div class="top-bar">
+    <img src="Fermata.jpg" alt="Logo Fermata" />
+  </div>
+
+  <!-- Header principale -->
+  <div class="header">
+    <!-- Logo e Titolo -->
+    <div class="logo-title">
+      <img src="refresco_logo.jpg" alt="Logo Refresco">
+      <h1>Fermi Attivi - LGV & Dorsali</h1>
+    </div>
+
+    <!-- Pulsanti -->
+    <div class="controls">
+      <a href="index.html" class="btn btn-home">Menù</a>
+      <button id="export-btn" class="btn btn-export">Esporta</button>
+      <button id="dark-toggle" class="btn btn-dark">Modalità Scura</button>
+    </div>
+  </div>
+
+  <!-- Resto della pagina... -->
+  <div id="loading">Caricamento dati...</div>
+  <table id="data-table" style="display:none;">
+    <thead>
+      <tr>
+        <th>INIZIO FERMATA</th>
+        <th>MACCHINA</th>
+        <th>DESCRIZIONE FERMATA</th>
+        <th>DETTAGLIO FERMATA</th>
+        <th>CATEGORIA</th>
+        <th>DURATA FERMO</th>
+        <th>GRUPPO</th>
+      </tr>
+    </thead>
+    <tbody id="table-body"></tbody>
+  </table>
+  <div id="total-count"></div>
+
+  <audio id="notify-sound" preload="auto">
+    <source src="data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAESsAACJWAAACABAAZGF0YQAAAAA=" type="audio/wav">
+  </audio>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <script>
+    const supabaseUrl = 'https://orttbxpxuohxfsqwrzcy.supabase.co';
+    const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9ydHRieHB4dW9oeGZzcXdyemN5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA4NDAxMTksImV4cCI6MjA2NjQxNjExOX0.Lxe0r28sb4-JYRasIJJU13uq8sfiGSeNTeuWC98_wCs';
+    const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+
+    let currentData = [];
+    let lastDataKeys = [];
+
+    function formatDate(dt) {
+      const d = new Date(dt);
+      return d.toLocaleString("it-IT");
+    }
+
+    function getKey(row) {
+      return row.StartDate + "_" + row.Dorsale;
+    }
+
+    function playNotification() {
+      const audio = document.getElementById('notify-sound');
+      audio.play().catch(() => {});
+    }
+
+    function showDesktopNotification() {
+      if (Notification.permission === "granted") {
+        new Notification("Nuovi fermi rilevati!", {
+          body: "Ci sono nuove righe nella tabella.",
+          icon: "https://cdn-icons-png.flaticon.com/512/1827/1827401.png"
+        });
+      }
+    }
+
+    async function loadData() {
+      document.getElementById('loading').innerText = 'Caricamento dati...';
+      document.getElementById('data-table').style.display = 'none';
+      document.getElementById('table-body').innerHTML = '';
+
+      let { data, error } = await supabase
+        .from('fermi_act')
+        .select('*')
+        .order('Fonte', { ascending: true })
+        .order('Dorsale', { ascending: true });
+
+      if (error) {
+        document.getElementById('loading').innerText = 'Errore: ' + error.message;
+        return;
+      }
+
+      const newKeys = data.map(getKey);
+      const hasChanges = JSON.stringify(newKeys) !== JSON.stringify(lastDataKeys);
+
+      if (hasChanges) {
+        playNotification();
+        showDesktopNotification();
+        document.getElementById('data-table').classList.add('notify-border');
+        setTimeout(() => {
+          document.getElementById('data-table').classList.remove('notify-border');
+        }, 3000);
+      }
+
+      lastDataKeys = newKeys;
+      currentData = data;
+
+      const tbody = document.getElementById('table-body');
+      data.forEach(row => {
+        const tr = document.createElement('tr');
+        const minutes = parseFloat((row.TotalAlarmTimeSpan || "0").toString().replace(',', '.'));
+        if (minutes > 5) tr.classList.add('row-danger');
+
+        tr.innerHTML = `
+          <td>${formatDate(row.StartDate)}</td>
+          <td class="bold">${row.Dorsale}</td>
+          <td>${row.AlarmDescription}</td>
+          <td>${row.AlarmDetails || '-'}</td>
+          <td>${row.AlarmCategory}</td>
+          <td>${row.TotalAlarmTimeSpan}</td>
+          <td>${row.Fonte}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+
+      document.getElementById('loading').style.display = 'none';
+      document.getElementById('data-table').style.display = 'table';
+      document.getElementById('total-count').innerText = `Totale righe visualizzate: ${data.length}`;
+    }
+
+    function exportToExcel() {
+      const rows = currentData.map(row => ({
+        'INIZIO FERMATA': formatDate(row.StartDate),
+        'MACCHINA': row.Dorsale,
+        'DESCRIZIONE FERMATA': row.AlarmDescription,
+        'DETTAGLIO FERMATA': row.AlarmDetails || '-',
+        'CATEGORIA': row.AlarmCategory,
+        'DURATA FERMO': row.TotalAlarmTimeSpan,
+        'GRUPPO': row.Fonte
+      }));
+
+      const worksheet = XLSX.utils.json_to_sheet(rows);
+      const workbook = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(workbook, worksheet, "Fermi Attivi");
+      XLSX.writeFile(workbook, "fermi_attivi.xlsx");
+    }
+
+    function toggleDarkMode() {
+      document.body.classList.toggle("dark");
+      localStorage.setItem("darkMode", document.body.classList.contains("dark"));
+    }
+
+    if (localStorage.getItem("darkMode") === "true") {
+      document.body.classList.add("dark");
+    }
+
+    if (Notification.permission !== "granted") {
+      Notification.requestPermission();
+    }
+
+    document.getElementById('export-btn').addEventListener('click', exportToExcel);
+    document.getElementById('dark-toggle').addEventListener('click', toggleDarkMode);
+
+    loadData();
+    setInterval(loadData, 15000);
+  </script>
+</body>
+</html>
