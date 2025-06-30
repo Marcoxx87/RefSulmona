@@ -19,7 +19,7 @@
       color: #333;
       position: relative;
       min-height: 100vh;
-      padding-bottom: 60px;
+      padding-bottom: 80px; /* spazio per bottoni in basso */
     }
 
     header {
@@ -145,11 +145,24 @@
       color: #fff;
     }
 
-    .bottom-links .center {
-      margin: 0 auto;
-      position: absolute;
+    .oee-button {
+      position: fixed;
+      bottom: 55px;
       left: 50%;
       transform: translateX(-50%);
+      font-size: 12px;
+      background-color: #007bbd;
+      color: white;
+      padding: 8px 16px;
+      border-radius: 8px;
+      text-decoration: none;
+      font-weight: bold;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+      transition: background-color 0.3s;
+    }
+
+    .oee-button:hover {
+      background-color: #005c99;
     }
 
     @media screen and (min-width: 700px) {
@@ -199,9 +212,10 @@
     <div id="clock" class="clock"></div>
   </div>
 
+  <a href="https://80.21.24.216:594/OEEblueDashboard_Sulmona/PlantDashboard.aspx" class="oee-button" target="_blank">OEEBlue</a>
+
   <div class="bottom-links">
     <a href="https://refresco.sharepoint.com/sites/ITA-MFG-Action-Plan_Sulmona/Lists/Action%20Plan%20Sulmona/AllItems.aspx" target="_blank">Action Plan</a>
-    <a href="https://80.21.24.216:594/OEEblueDashboard_Sulmona/PlantDashboard.aspx" class="center" target="_blank">OEEBlue</a>
     <a href="https://refresco.sharepoint.com/sites/ITA-MFG-Action-Plan_Sulmona/Lists/Malfunzionamenti%20Magazzino/AllItems.aspx" target="_blank">Magazzino Automatico</a>
   </div>
 
