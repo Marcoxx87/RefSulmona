@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Missioni RIFIUTATE</title>
+
+  <link rel="icon" href="refresco_logo.jpg" type="image/jpg" />
+  <meta name="theme-color" content="#d32f2f">
+  <link rel="manifest" href="manifest.json">
+
+  <style>
+    body {
+      font-family: "Segoe UI", sans-serif;
+      background-color: #fff;
+      color: #333;
+      margin: 0;
+      padding: 10px;
+    }
+
+    .top-bar {
+      display: flex;
+      justify-content: flex-end;
+      padding: 5px;
+    }
+
+    .top-bar img {
+      height: 30px;
+    }
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      margin-bottom: 20px;
+    }
+
+    .logo-title {
+      display: flex;
+      align-items: center;
+      flex: 1;
+    }
+
+    .logo-title img {
+      height: 40px;
+      margin-right: 15px;
+    }
+
+    .logo-title h1 {
+      font-size: 24px;
+      margin: 0;
+      color: #d32f2f;
+      flex: 1;
+      text-align: center;
+    }
+
+    .controls {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      padding: 8px 12px;
+      border-radius: 6px;
+      border: none;
+      font-weight: bold;
+      cursor: pointer;
+      font-size: 14px;
+    }
+
+    .btn-home {
+      background-color: #2196f3;
+      color: white;
+    }
+
+    .btn-home:hover {
+      background-color: #1976d2;
+    }
+
+    .btn-dark {
+      background-color: #333;
+      color: white;
+    }
+
+    .btn-dark:hover {
+      background-color: #555;
+    }
+
+    .btn-export {
+      background-color: #4caf50;
+      color: white;
+    }
+
+    .btn-export:hover {
+      background-color: #388e3c;
+    }
+
+    .btn-translate {
+      background-color: #d32f2f;
+      color: white;
+    }
+
+    .btn-translate:hover {
+      background-color: #9a0007;
+    }
+
+    .table-container {
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+      font-size: 14px;
+      background-color: #ffe5e5;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      min-width: 700px;
+    }
+
+    th, td {
+      border: 1px solid #ccc;
+      padding: 8px;
+      text-align: left;
+    }
+
+
+    th {
+      background-color: #d32f2f;
+      color: #fff;
+      text-transform: uppercase;
+    }
+
+    tr:hover {
+      background-color: #f9c0c0;
+    }
+
+    .bold {
+      font-weight: bold;
+    }
+
+    #total-count {
+      margin-top: 10px;
+      font-weight: bold;
+    }
+
+    body.dark {
+      background-color: #121212;
+      color: #eee;
+    }
+    body.dark table {
+      background-color: #2c2c2c;
+    }
+    body.dark th {
+      background-color: #555;
+    }
+    body.dark td {
+      color: #ddd;
+    }
+
+    @media screen and (max-width: 768px) {
+      th, td {
+        font-size: 12px;
+      }
+      .controls {
+        justify-content: center;
+        flex-wrap: wrap;
+      }
+      .logo-title img {
+        height: 30px;
+      }
+      .logo-title h1 {
+        font-size: 18px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="top-bar">
+    <img src="missioni_rifiutate.svg" alt="Logo Refresco" />
+  </div>
+
+  <div class="header">
+    <div class="logo-title">
+      <img src="refresco_logo.jpg" alt="Logo Refresco" />
+      <h1>Missioni RIFIUTATE</h1>
+    </div>
+    <div class="controls">
+      <a href="index.html" class="btn btn-home">Home</a>
+      
+      <button id="export-btn" class="btn btn-export">Esporta</button>
+      <button id="dark-toggle" class="btn btn-dark">Modalità Scura</button>
+<button id="translate-btn" class="btn btn-translate">🇮🇹</button>
+    </div>
+  </div>
+
+  <div id="loading">Caricamento dati...</div>
+
+  <div class="table-container">
+    <table id="data-table" style="display: none;">
+      <thead>
+        <tr>
+          <th>Data Errore</th>
+          <th>Missione</th>
+          <th>Linea Richiedente</th>
+          <th>Errore Riscontrato</th>
+          <th>Mission Request</th>
+        </tr>
+      </thead>
+      <tbody id="table-body"></tbody>
+    </table>
+  </div>
+
+  <div id="total-count"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <script>
+    const supabase = window.supabase.createClient(
+      'https://orttbxpxuohxfsqwrzcy.supabase.co',
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9ydHRieHB4dW9oeGZzcXdyemN5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA4NDAxMTksImV4cCI6MjA2NjQxNjExOX0.Lxe0r28sb4-JYRasIJJU13uq8sfiGSeNTeuWC98_wCs'
+    );
+
+    let currentData = [];
+    let currentLang = 'it';
+
+    const translations = {
+      fullSentences: {
+        "Source Location: PICK_RM_81 IS Already Have LPN: EPS120000006332154 Is Not Empty please Clear Location Before Make new Request":
+          "Sorgente Locazione: PICK_RM_81 ha già LPN: EPS120000006332154, non è vuota. Liberare la locazione prima di effettuare una nuova richiesta."
+      },
+      singleWords: {
+        "Destination": "Destinazione",
+"Destinazione": "Destination",
+        "Source": "Sorgente",
+        "Location": "Locazione",
+        "is": "è",
+        "Already": "già",
+        "connected": "collegata",
+        "to": "a",
+        "an": "una",
+        "active": "attiva",
+        "or": "o",
+        "Pending": "in sospeso",
+        "Mission": "Missione",
+        "Request": "Richiesta",
+        "Retrieval": "Prelievo",
+        "Disabled": "Disabilitato",
+        "Blocked": "Bloccato",
+        "Not": "non",
+        "Empty": "vuota",
+        "please": "per favore",
+        "Clear": "liberare",
+        "Before": "prima di",
+        "Make": "effettuare",
+        "new": "nuova"
+      }
+    };
+
+    function translateError(text, lang) {
+      if (!text) return "-";
+
+      if (translations.fullSentences[text]) {
+        return translations.fullSentences[text];
+      }
+
+      let translated = text;
+
+      translated = translated.replace(/\b(\w+)\b/g, (word) => {
+        return translations.singleWords[word] || word;
+      });
+
+      return translated;
+    }
+
+    async function loadData() {
+      document.getElementById('loading').innerText = 'Caricamento dati...';
+      document.getElementById('data-table').style.display = 'none';
+      document.getElementById('table-body').innerHTML = '';
+
+      let { data, error } = await supabase
+        .from('miss_rejected')
+        .select('*')
+        .order('InsertDateTime', { ascending: false });
+
+      if (error) {
+        document.getElementById('loading').innerText = 'Errore: ' + error.message;
+        return;
+      }
+
+      data = data.filter(row => (row.ErroreRiscontrato || '').length >= 5);
+      currentData = data;
+
+      if (!data.length) {
+        document.getElementById('loading').innerText = 'Nessun dato trovato.';
+        return;
+      }
+
+      const tbody = document.getElementById('table-body');
+
+      data.forEach(row => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${row.InsertDateTime ? new Date(row.InsertDateTime).toLocaleString('it-IT') : '-'}</td>
+          <td class="bold">${row.MIS_Id_Message || '-'}</td>
+          <td>${row.LineaRichiedente || '-'}</td>
+          <td class="error-cell">${translateError(row.ErroreRiscontrato, currentLang)}</td>
+          <td>MIS RQS Rejected</td>
+        `;
+        tbody.appendChild(tr);
+      });
+
+      document.getElementById('loading').style.display = 'none';
+      document.getElementById('data-table').style.display = 'table';
+      document.getElementById('total-count').innerText = `Totale righe visualizzate: ${data.length}`;
+    }
+
+    function toggleDarkMode() {
+      document.body.classList.toggle("dark");
+      localStorage.setItem("darkMode", document.body.classList.contains("dark"));
+    }
+
+    function exportToExcel() {
+      const rows = currentData.map(row => ({
+        'Data Errore': row.InsertDateTime ? new Date(row.InsertDateTime).toLocaleString('it-IT') : '',
+        'Missione': row.MIS_Id_Message || '',
+        'Linea Richiedente': row.LineaRichiedente || '',
+        'Errore Riscontrato': translateError(row.ErroreRiscontrato, currentLang),
+        'Mission Request': 'MIS RQS Rejected'
+      }));
+      const worksheet = XLSX.utils.json_to_sheet(rows);
+      const workbook = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(workbook, worksheet, "Missioni Rifiutate");
+      XLSX.writeFile(workbook, "missioni_rifiutate.xlsx");
+    }
+
+    document.getElementById('dark-toggle').addEventListener('click', toggleDarkMode);
+    document.getElementById('export-btn').addEventListener('click', exportToExcel);
+    document.getElementById('translate-btn').addEventListener('click', () => {
+      currentLang = currentLang === 'it' ? 'en' : 'it';
+      document.getElementById('translate-btn').textContent = currentLang === 'it' ? '🇮🇹' : '🇬🇧';
+      loadData();
+    });
+
+    if (localStorage.getItem("darkMode") === "true") {
+      document.body.classList.add("dark");
+    }
+
+    loadData();
+  </script>
+
+</body>
+</html>

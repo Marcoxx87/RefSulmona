@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Stock Unit Magazzino</title>
+
+  <link rel="icon" href="stockunit_logo.jpg" type="image/jpg" />
+  <meta name="theme-color" content="#3BB9FF">
+  <link rel="manifest" href="manifest.json">
+
+  <style>
+    body {
+      font-family: "Segoe UI", sans-serif;
+      background-color: #fff;
+      color: #333;
+      margin: 0;
+      padding: 10px;
+    }
+
+    .top-bar {
+      display: flex;
+      justify-content: flex-end;
+      padding: 5px;
+    }
+
+    .top-bar img {
+      height: 30px;
+    }
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      margin-bottom: 20px;
+    }
+
+    .logo-title {
+      display: flex;
+      align-items: center;
+      flex: 1;
+    }
+
+    .logo-title img {
+      height: 40px;
+      margin-right: 15px;
+    }
+
+    .logo-title h1 {
+      font-size: 24px;
+      margin: 0;
+      color: #007bbd;
+      flex: 1;
+      text-align: center;
+    }
+
+    .controls {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      padding: 8px 12px;
+      border-radius: 6px;
+      border: none;
+      font-weight: bold;
+      cursor: pointer;
+      font-size: 14px;
+    }
+
+    .btn-home {
+      background-color: #2196f3;
+      color: white;
+    }
+
+    .btn-home:hover {
+      background-color: #1976d2;
+    }
+
+    .btn-dark {
+      background-color: #333;
+      color: white;
+    }
+
+    .btn-dark:hover {
+      background-color: #555;
+    }
+
+    .btn-export {
+      background-color: #4caf50;
+      color: white;
+    }
+
+    .btn-export:hover {
+      background-color: #388e3c;
+    }
+
+    .filters-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+      align-items: flex-end;
+      margin-bottom: 20px;
+    }
+
+    .filter-section {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .filter-section label {
+      font-weight: bold;
+      color: #0d47a1;
+      font-size: 14px;
+      margin-bottom: 5px;
+    }
+
+    .filter-buttons {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .filter-btn {
+      background-color: #90caf9;
+      color: #003366;
+    }
+
+    .filter-btn.active {
+      background-color: #3BB9FF;
+      color: white;
+    }
+
+    .filter-btn:hover {
+      background-color: #1976d2;
+      color: white;
+    }
+
+    .filter-group input {
+      padding: 6px;
+      border-radius: 4px;
+      border: 1px solid #90caf9;
+      background-color: #fff;
+      font-weight: normal;
+    }
+
+    .table-container {
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+      font-size: 13px;
+      background-color: #fff;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      min-width: 800px;
+    }
+
+    th, td {
+      border: 1px solid #ccc;
+      padding: 8px;
+      text-align: left;
+    }
+
+    th {
+      background-color: #3BB9FF;
+      color: #fff;
+      text-transform: uppercase;
+    }
+
+    tr:hover {
+      background-color: #d0ebff;
+    }
+
+    .details-row {
+      background-color: #f9f9f9;
+      display: none;
+    }
+
+    .details-row td {
+      padding: 10px;
+    }
+
+    .details-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 5px;
+    }
+
+    .details-table th, .details-table td {
+      border: 1px solid #aaa;
+      padding: 6px;
+      font-size: 12px;
+    }
+
+    .details-table th {
+      background-color: #007bbd;
+      color: #fff;
+    }
+
+    .lpn-link {
+      display: inline-block;
+      background-color: #3BB9FF;
+      color: #fff;
+      padding: 4px 8px;
+      border-radius: 4px;
+      text-decoration: none;
+      font-size: 12px;
+    }
+
+    .lpn-link:hover {
+      background-color: #007bbd;
+    }
+
+    #total-count {
+      margin-top: 10px;
+      font-weight: bold;
+    }
+
+    body.dark {
+      background-color: #121212;
+      color: #eee;
+    }
+    body.dark table {
+      background-color: #1e1e1e;
+    }
+    body.dark th {
+      background-color: #333;
+    }
+    body.dark td {
+      color: #ddd;
+    }
+    body.dark .details-row {
+      background-color: #333;
+    }
+    body.dark .details-table th {
+      background-color: #555;
+    }
+    body.dark .details-table td {
+      background-color: #222;
+      color: #ddd;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="top-bar">
+    <img src="stock_unit.svg" alt="Logo Stock Unit" />
+  </div>
+
+  <div class="header">
+    <div class="logo-title">
+      <img src="refresco_logo.jpg" alt="Logo Stock Unit" />
+      <h1>Stock Unit Magazzino</h1>
+    </div>
+    <div class="controls">
+      <a href="index.html" class="btn btn-home">Home</a>
+      <button id="export-btn" class="btn btn-export">Esporta</button>
+      <button id="dark-toggle" class="btn btn-dark">Modalità Scura</button>
+    </div>
+  </div>
+
+  <div class="filters-container">
+    <div class="filter-section">
+      <label>Filtro ubicazioni</label>
+      <div class="filter-buttons">
+        <button class="btn filter-btn" data-filter="RM">RAW MATERIALS</button>
+        <button class="btn filter-btn" data-filter="SA">BAIE</button>
+        <button class="btn filter-btn" data-filter="ALL">TUTTI</button>
+      </div>
+    </div>
+
+    <div class="filter-section">
+      <label>Articolo Ricercato</label>
+      <input type="text" id="filter-item" placeholder="Es. 1191161">
+    </div>
+  </div>
+
+  <div id="loading">Caricamento dati...</div>
+
+  <div class="table-container">
+    <table id="main-table" style="display: none;">
+      <thead>
+        <tr>
+          <th>Baia</th>
+          <th>Totale LPN</th>
+          <th>Articoli diversi</th>
+        </tr>
+      </thead>
+      <tbody id="table-body"></tbody>
+    </table>
+  </div>
+
+  <div id="total-count"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <script>
+    // NON RIMOSSA L'API KEY
+    const supabase = window.supabase.createClient(
+      'https://orttbxpxuohxfsqwrzcy.supabase.co',
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9ydHRieHB4dW9oeGZzcXdyemN5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA4NDAxMTksImV4cCI6MjA2NjQxNjExOX0.Lxe0r28sb4-JYRasIJJU13uq8sfiGSeNTeuWC98_wCs'
+    );
+
+    let groupedData = {};
+    let currentFilter = "RM";
+    let currentItemFilter = "";
+
+    async function loadData() {
+      document.getElementById('loading').innerText = 'Caricamento dati...';
+      document.getElementById('main-table').style.display = 'none';
+      document.getElementById('table-body').innerHTML = '';
+
+      const { data, error } = await supabase
+        .from('inventory_stockunit')
+        .select('*')
+        .order('Name', { ascending: true });
+
+      if (error) {
+        document.getElementById('loading').innerText = 'Errore: ' + error.message;
+        return;
+      }
+
+      let filtered = data;
+
+      if (currentFilter === 'SA') {
+        filtered = data.filter(r => (r.Name || '').startsWith('SA'));
+      } else if (currentFilter === 'RM') {
+        filtered = data.filter(r => !(r.Name || '').startsWith('SA'));
+      }
+
+      if (currentItemFilter) {
+        filtered = filtered.filter(r => (r.Name_Item || '').toLowerCase().includes(currentItemFilter.toLowerCase()));
+      }
+
+      groupedData = {};
+      filtered.forEach(row => {
+        const key = row.Name || 'Sconosciuto';
+        if (!groupedData[key]) {
+          groupedData[key] = { rows: [] };
+        }
+        groupedData[key].rows.push(row);
+      });
+
+      let total = 0;
+      const tbody = document.getElementById('table-body');
+      Object.entries(groupedData).forEach(([baia, group]) => {
+        const totalLpn = group.rows.length;
+        const uniqueItems = [...new Set(group.rows.map(r => r.Name_Item))].length;
+
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${baia}</td>
+          <td>${totalLpn}</td>
+          <td>${uniqueItems}</td>
+        `;
+
+        const detailRow = document.createElement('tr');
+        detailRow.classList.add('details-row');
+        detailRow.innerHTML = `
+          <td colspan="3">
+            ${buildDetailsTable(group.rows)}
+          </td>
+        `;
+
+        tr.addEventListener('click', () => {
+          detailRow.style.display = detailRow.style.display === 'table-row' ? 'none' : 'table-row';
+        });
+
+        tbody.appendChild(tr);
+        tbody.appendChild(detailRow);
+        total++;
+      });
+
+      document.getElementById('loading').style.display = 'none';
+      document.getElementById('main-table').style.display = 'table';
+      document.getElementById('total-count').innerText = `Totale baie visualizzate: ${total}`;
+    }
+
+    function buildDetailsTable(rows) {
+      let html = `
+        <table class="details-table">
+          <thead>
+            <tr>
+              <th>LPN</th>
+              <th>Codice Articolo</th>
+              <th>Descrizione Articolo</th>
+            </tr>
+          </thead>
+          <tbody>
+      `;
+
+      rows.forEach(r => {
+        html += `
+          <tr>
+            <td>
+              <a href="#" onclick="openPopup('${r.LPN}'); return false;" class="lpn-link">
+                ${r.LPN || '-'}
+              </a>
+            </td>
+            <td>${r.Name_Item || '-'}</td>
+            <td>${r.Description_Item || '-'}</td>
+          </tr>
+        `;
+      });
+
+      html += '</tbody></table>';
+      return html;
+    }
+
+    function openPopup(lpn) {
+      window.open(
+        `dettaglio_popup.html?lpn=${encodeURIComponent(lpn)}`,
+        'DettaglioLPN',
+        'width=600,height=400'
+      );
+    }
+
+    function exportToExcel() {
+      let rows = [];
+      Object.entries(groupedData).forEach(([baia, group]) => {
+        group.rows.forEach(r => {
+          rows.push({
+            Baia: baia,
+            LPN: r.LPN,
+            CodiceArticolo: r.Name_Item,
+            Descrizione: r.Description_Item
+          });
+        });
+      });
+
+      const worksheet = XLSX.utils.json_to_sheet(rows);
+      const workbook = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(workbook, worksheet, "StockUnit");
+      XLSX.writeFile(workbook, "inventory_stockunit.xlsx");
+    }
+
+    function toggleDarkMode() {
+      document.body.classList.toggle("dark");
+      localStorage.setItem("darkMode", document.body.classList.contains("dark"));
+    }
+
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        currentFilter = btn.dataset.filter;
+        loadData();
+      });
+    });
+
+    document.getElementById('filter-item').addEventListener('input', e => {
+      currentItemFilter = e.target.value;
+      loadData();
+    });
+
+    document.getElementById('dark-toggle').addEventListener('click', toggleDarkMode);
+    document.getElementById('export-btn').addEventListener('click', exportToExcel);
+
+    if (localStorage.getItem("darkMode") === "true") {
+      document.body.classList.add("dark");
+    }
+
+    document.querySelector('[data-filter="RM"]').classList.add('active');
+    loadData();
+  </script>
+</body>
+</html>

@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Dettaglio LPN</title>
+
+  <style>
+    body {
+      font-family: "Segoe UI", sans-serif;
+      background-color: #fff;
+      color: #333;
+      margin: 0;
+      padding: 20px;
+      text-align: center;
+    }
+
+    h1 {
+      font-size: 22px;
+      margin-bottom: 10px;
+      color: #007bbd;
+    }
+
+    .lpn-code {
+      font-size: 24px;
+      font-weight: bold;
+      margin: 20px 0;
+      word-break: break-all;
+      color: #007bbd;
+    }
+
+    #barcode {
+      margin: 20px auto;
+      max-width: 90%;
+      height: auto;
+    }
+
+    .btn-close {
+      margin-top: 30px;
+      padding: 14px 28px;
+      border: none;
+      background-color: #2196f3;
+      color: #fff;
+      font-weight: bold;
+      border-radius: 8px;
+      font-size: 16px;
+      cursor: pointer;
+      width: 80%;
+      max-width: 300px;
+    }
+
+    .btn-close:hover {
+      background-color: #1976d2;
+    }
+
+    body.dark {
+      background-color: #121212;
+      color: #eee;
+    }
+    body.dark .lpn-code {
+      color: #3BB9FF;
+    }
+    body.dark .btn-close {
+      background-color: #555;
+    }
+    body.dark .btn-close:hover {
+      background-color: #333;
+    }
+
+    @media screen and (max-width: 480px) {
+      .lpn-code {
+        font-size: 20px;
+      }
+
+      .btn-close {
+        font-size: 14px;
+        padding: 12px 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Dettaglio LPN</h1>
+  <div class="lpn-code" id="lpn-text"></div>
+  <svg id="barcode"></svg>
+
+  <button class="btn-close" onclick="window.close()">Chiudi</button>
+
+  <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const lpn = params.get('lpn');
+
+    if (lpn) {
+      document.getElementById('lpn-text').textContent = lpn;
+
+      // Codifica GS1-128 (FNC1) + AI (00)
+      const gs1Data = String.fromCharCode(202) + '00' + lpn;
+      JsBarcode("#barcode", gs1Data, {
+        format: "CODE128",
+        lineColor: "#333",
+        width: 2,
+        height: 80,
+        displayValue: true,
+        textMargin: 5,
+        fontSize: 16,
+        margin: 10
+      });
+    } else {
+      document.getElementById('lpn-text').textContent = "LPN non specificato";
+    }
+
+    if (localStorage.getItem("darkMode") === "true") {
+      document.body.classList.add("dark");
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dettaglio LPN</title>
+
+  <link rel="icon" href="refresco_logo.jpg" type="image/jpg" />
+  <meta name="theme-color" content="#3BB9FF" />
+
+  <style>
+    body {
+      font-family: "Segoe UI", sans-serif;
+      background-color: #ffffff;
+      color: #333;
+      margin: 0;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .logo {
+      height: 50px;
+      margin-bottom: 20px;
+    }
+
+    h1 {
+      color: #007bbd;
+      font-size: 24px;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+
+    .lpn-value {
+      font-size: 24px;
+      font-weight: bold;
+      margin-bottom: 20px;
+      word-break: break-all;
+      color: #d32f2f;
+    }
+
+    #barcode {
+      margin-bottom: 30px;
+    }
+
+    .btn {
+      background-color: #2196f3;
+      color: #fff;
+      border: none;
+      padding: 10px 16px;
+      font-size: 14px;
+      border-radius: 5px;
+      text-decoration: none;
+      font-weight: bold;
+      cursor: pointer;
+      display: inline-block;
+    }
+
+    .btn:hover {
+      background-color: #1976d2;
+    }
+
+    body.dark {
+      background-color: #121212;
+      color: #eee;
+    }
+
+    body.dark .lpn-value {
+      color: #ff9800;
+    }
+
+    body.dark .btn {
+      background-color: #555;
+      color: #fff;
+    }
+
+    body.dark .btn:hover {
+      background-color: #333;
+    }
+  </style>
+</head>
+<body>
+  <img src="refresco_logo.jpg" alt="Logo Refresco" class="logo" />
+
+  <h1>Dettaglio LPN</h1>
+
+  <div class="lpn-value" id="lpn-text"></div>
+
+  <svg id="barcode"></svg>
+
+  <a href="index.html" class="btn">Torna alla Home</a>
+
+  <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/JsBarcode.all.min.js"></script>
+  <script>
+    // Recupera parametro LPN dalla query string
+    const urlParams = new URLSearchParams(window.location.search);
+    const lpn = urlParams.get('lpn');
+
+    if (lpn) {
+      document.getElementById('lpn-text').textContent = lpn;
+
+      // Codifica (00)+LPN nel barcode
+      const barcodeValue = "(00)" + lpn;
+
+      JsBarcode("#barcode", barcodeValue, {
+        format: "CODE128",
+        displayValue: true,
+        fontSize: 18,
+        lineColor: "#000",
+        width: 2,
+        height: 80,
+        margin: 10
+      });
+    } else {
+      document.getElementById('lpn-text').textContent = "Nessun LPN specificato.";
+    }
+
+    // Modalità dark
+    if (localStorage.getItem("darkMode") === "true") {
+      document.body.classList.add("dark");
+    }
+  </script>
+</body>
+</html>

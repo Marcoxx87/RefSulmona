@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Spedizioni Attive</title>
+
+  <link rel="icon" href="refresco_logo.jpg" type="image/jpg" />
+  <meta name="theme-color" content="#3BB9FF">
+  <link rel="manifest" href="manifest.json">
+
+  <style>
+    body {
+      font-family: "Segoe UI", sans-serif;
+      background-color: #fff;
+      color: #333;
+      margin: 0;
+      padding: 10px;
+    }
+
+    .top-bar {
+      display: flex;
+      justify-content: flex-end;
+      padding: 5px;
+    }
+
+    .top-bar img {
+      height: 30px;
+    }
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      margin-bottom: 20px;
+    }
+
+    .logo-title {
+      display: flex;
+      align-items: center;
+      flex: 1;
+    }
+
+    .logo-title img {
+      height: 40px;
+      margin-right: 15px;
+    }
+
+    .logo-title h1 {
+      font-size: 24px;
+      margin: 0;
+      color: #007bbd;
+      flex: 1;
+      text-align: center;
+    }
+
+    .controls {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      padding: 8px 12px;
+      border-radius: 6px;
+      border: none;
+      font-weight: bold;
+      cursor: pointer;
+      font-size: 14px;
+    }
+
+    .btn-home {
+      background-color: #2196f3;
+      color: white;
+    }
+
+    .btn-home:hover {
+      background-color: #1976d2;
+    }
+
+    .btn-dark {
+      background-color: #333;
+      color: white;
+    }
+
+    .btn-dark:hover {
+      background-color: #555;
+    }
+
+    .btn-export {
+      background-color: #4caf50;
+      color: white;
+    }
+
+    .btn-export:hover {
+      background-color: #388e3c;
+    }
+
+    .filters {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 15px;
+      margin-bottom: 20px;
+      background-color: #e3f2fd;
+      padding: 10px;
+      border-radius: 8px;
+    }
+
+    .filter-group {
+      display: flex;
+      flex-direction: column;
+      font-size: 14px;
+      font-weight: bold;
+      color: #0d47a1;
+      min-width: 160px;
+      flex: 1;
+    }
+
+    .filter-group input {
+      font-weight: normal;
+      padding: 6px;
+      border-radius: 4px;
+      border: 1px solid #90caf9;
+      background-color: #fff;
+    }
+
+    .table-container {
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+      font-size: 13px;
+      background-color: #fff;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      min-width: 1000px;
+    }
+
+    th, td {
+      border: 1px solid #ccc;
+      padding: 8px;
+      text-align: left;
+    }
+
+    th {
+      background-color: #3BB9FF;
+      color: #fff;
+      text-transform: uppercase;
+    }
+
+    tr:hover {
+      background-color: #d0ebff;
+    }
+
+    .details-row {
+      background-color: #f9f9f9;
+      display: none;
+    }
+
+    .details-row td {
+      padding: 10px;
+    }
+
+    .details-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 5px;
+    }
+
+    .details-table th, .details-table td {
+      border: 1px solid #aaa;
+      padding: 6px;
+      font-size: 12px;
+    }
+
+    .details-table th {
+      background-color: #007bbd;
+      color: #fff;
+    }
+
+    .progress-bar {
+      width: 100%;
+      background-color: #e0e0e0;
+      border-radius: 4px;
+      overflow: hidden;
+      height: 16px;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background-color: #4caf50;
+      text-align: center;
+      color: white;
+      font-size: 12px;
+      line-height: 16px;
+    }
+
+    .red-highlight {
+      background-color: #ffdddd;
+    }
+
+    .green-highlight {
+      background-color: #d2f8d2;
+    }
+
+    .yellow-highlight {
+      background-color: #fff7c0;
+    }
+
+    #total-count {
+      margin-top: 10px;
+      font-weight: bold;
+    }
+
+    .lpn-link {
+      display: inline-block;
+      background-color: #3BB9FF;
+      color: #fff;
+      padding: 4px 8px;
+      border-radius: 4px;
+      text-decoration: none;
+      font-size: 12px;
+    }
+
+    .lpn-link:hover {
+      background-color: #007bbd;
+    }
+
+    body.dark {
+      background-color: #121212;
+      color: #eee;
+    }
+    body.dark table {
+      background-color: #1e1e1e;
+    }
+    body.dark th {
+      background-color: #333;
+    }
+    body.dark td {
+      color: #ddd;
+    }
+    body.dark .details-row {
+      background-color: #333;
+    }
+    body.dark .details-table th {
+      background-color: #555;
+    }
+    body.dark .details-table td {
+      background-color: #222;
+      color: #ddd;
+    }
+
+    @media screen and (max-width: 768px) {
+      th, td {
+        font-size: 12px;
+      }
+      .controls {
+        justify-content: center;
+        flex-wrap: wrap;
+      }
+      .logo-title img {
+        height: 30px;
+      }
+      .logo-title h1 {
+        font-size: 18px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="top-bar">
+    <img src="shipment.svg" alt="Logo Shipment" style="height:40px;" />
+  </div>
+
+  <div class="header">
+    <div class="logo-title">
+      <img src="refresco_logo.jpg" alt="Logo Refresco" />
+      <h1>Spedizioni Attive</h1>
+    </div>
+    <div class="controls">
+      <a href="index.html" class="btn btn-home">Home</a>
+      <button id="export-btn" class="btn btn-export">Esporta</button>
+      <button id="dark-toggle" class="btn btn-dark">Modalità Scura</button>
+    </div>
+  </div>
+
+  <div class="filters">
+    <div class="filter-group">
+      <label for="filter-shipment">Numero Viaggio</label>
+      <input type="text" id="filter-shipment" placeholder="Esempio: 25000031091E">
+    </div>
+    <div class="filter-group">
+      <label for="filter-baia">Baia</label>
+      <input type="text" id="filter-baia" placeholder="Esempio: SA_UP_2">
+    </div>
+    <div class="filter-group">
+      <label for="filter-lpn">LPN</label>
+      <input type="text" id="filter-lpn" placeholder="Esempio: 380547...">
+    </div>
+  </div>
+
+  <div id="loading">Caricamento dati...</div>
+
+  <div class="table-container">
+    <table id="main-table" style="display: none;">
+      <thead>
+        <tr>
+          <th>Numero Viaggio</th>
+          <th>Baia</th>
+          <th>Staging Progress</th>
+          <th>Pallet Consegnati</th>
+          <th>Pallet Previsti</th>
+          <th>Errore</th>
+          <th>Priorità</th>
+          <th>Shipment Status</th>
+        </tr>
+      </thead>
+      <tbody id="table-body"></tbody>
+    </table>
+  </div>
+
+  <div id="total-count"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <script>
+    const supabase = window.supabase.createClient(
+      'https://orttbxpxuohxfsqwrzcy.supabase.co',
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9ydHRieHB4dW9oeGZzcXdyemN5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA4NDAxMTksImV4cCI6MjA2NjQxNjExOX0.Lxe0r28sb4-JYRasIJJU13uq8sfiGSeNTeuWC98_wCs'
+    );
+
+    let groupedData = {};
+    let lpnInventorySet = new Set();
+
+    async function loadData() {
+      document.getElementById('loading').innerText = 'Caricamento dati...';
+      document.getElementById('main-table').style.display = 'none';
+      document.getElementById('table-body').innerHTML = '';
+
+      // 🔶 PRIMA: carica gli LPN presenti in inventory_stockunit
+      let { data: inventory, error: invError } = await supabase
+        .from('inventory_stockunit')
+        .select('LPN');
+
+      if (invError) {
+        document.getElementById('loading').innerText = 'Errore (inventory): ' + invError.message;
+        return;
+      }
+
+      lpnInventorySet = new Set((inventory || []).map(row => String(row.LPN)));
+
+      // ORA carica shipment_pallets
+      let { data, error } = await supabase
+        .from('shipment_pallets')
+        .select('*')
+        .order('StagingAreaName', { ascending: true })
+        .order('ShipmentNumber', { ascending: true });
+
+      if (error) {
+        document.getElementById('loading').innerText = 'Errore: ' + error.message;
+        return;
+      }
+
+      groupedData = {};
+      data.forEach(row => {
+        const key = row.ShipmentNumber;
+        if (!groupedData[key]) {
+          groupedData[key] = {
+            summary: row,
+            details: []
+          };
+        }
+        groupedData[key].details.push(row);
+      });
+
+      const filterShipment = document.getElementById('filter-shipment').value.toLowerCase();
+      const filterBaia = document.getElementById('filter-baia').value.toLowerCase();
+      const filterLpn = document.getElementById('filter-lpn').value.toLowerCase();
+
+      const tbody = document.getElementById('table-body');
+      let totalRows = 0;
+
+      Object.values(groupedData).forEach(group => {
+        const s = group.summary;
+
+        if (
+          (filterShipment && !s.ShipmentNumber.toLowerCase().includes(filterShipment)) ||
+          (filterBaia && !((s.StagingAreaName || '').toLowerCase().includes(filterBaia))) ||
+          (filterLpn && !group.details.some(d => (String(d.LPN) || '').toLowerCase().includes(filterLpn)))
+        ) {
+          return;
+        }
+
+        let progressPct = s.PalletPrevisti > 0
+          ? Math.round((s.PalletConsegnati / s.PalletPrevisti) * 100)
+          : 0;
+
+        let rowClass = '';
+        if (s.FaultCodeDescription && s.FaultCodeDescription.length > 3) {
+          rowClass = 'red-highlight';
+        }
+        if (progressPct === 100) {
+          rowClass = 'green-highlight';
+        }
+
+        const tr = document.createElement('tr');
+        tr.className = rowClass;
+        tr.innerHTML = `
+          <td>${s.ShipmentNumber}</td>
+          <td><strong>${s.StagingAreaName || '-'}</strong></td>
+          <td>
+            <div class="progress-bar">
+              <div class="progress-fill" style="width: ${progressPct}%">${progressPct}%</div>
+            </div>
+          </td>
+          <td>${s.PalletConsegnati || '-'}</td>
+          <td>${s.PalletPrevisti || '-'}</td>
+          <td>${s.FaultCodeDescription || '-'}</td>
+          <td>${s.Priority || '-'}</td>
+          <td>${s.ShipmentStatusDescription || '-'}</td>
+        `;
+
+        const detailRow = document.createElement('tr');
+        detailRow.classList.add('details-row');
+        detailRow.innerHTML = `
+          <td colspan="8">
+            ${buildDetailsTable(group.details)}
+          </td>
+        `;
+
+        tr.addEventListener('click', () => {
+          detailRow.style.display = detailRow.style.display === 'table-row' ? 'none' : 'table-row';
+        });
+
+        tbody.appendChild(tr);
+        tbody.appendChild(detailRow);
+        totalRows++;
+      });
+
+      document.getElementById('loading').style.display = 'none';
+      document.getElementById('main-table').style.display = 'table';
+      document.getElementById('total-count').innerText = `Totale spedizioni visualizzate: ${totalRows}`;
+    }
+
+    function buildDetailsTable(details) {
+      let html = `
+        <table class="details-table">
+          <thead>
+            <tr>
+              <th>LPN</th>
+              <th>SKU</th>
+              <th>Descrizione</th>
+              <th>Quantità</th>
+              <th>Lotto</th>
+              <th>Data Staging</th>
+            </tr>
+          </thead>
+          <tbody>
+      `;
+      details.forEach(item => {
+        const lpnExists = lpnInventorySet.has(String(item.LPN));
+        html += `
+          <tr class="${lpnExists ? 'yellow-highlight' : ''}">
+            <td>
+              <a href="#" onclick="openLpnPopup('${item.LPN}')" class="lpn-link">
+                ${item.LPN || '-'}
+              </a>
+            </td>
+            <td>${item.Name_Item || '-'}</td>
+            <td>${item.Description_Item || '-'}</td>
+            <td>${item.Quantity || '-'}</td>
+            <td>${item.Name_Lot || '-'}</td>
+            <td>${item.StagedDateTime ? new Date(item.StagedDateTime).toLocaleString('it-IT') : '-'}</td>
+          </tr>
+        `;
+      });
+      html += '</tbody></table>';
+      return html;
+    }
+
+    function toggleDarkMode() {
+      document.body.classList.toggle("dark");
+      localStorage.setItem("darkMode", document.body.classList.contains("dark"));
+    }
+
+    document.getElementById('dark-toggle').addEventListener('click', toggleDarkMode);
+    document.getElementById('export-btn').addEventListener('click', exportToExcel);
+
+    document.getElementById('filter-shipment').addEventListener('input', loadData);
+    document.getElementById('filter-baia').addEventListener('input', loadData);
+    document.getElementById('filter-lpn').addEventListener('input', loadData);
+
+    function exportToExcel() {
+      let rows = [];
+      Object.values(groupedData).forEach(group => {
+        group.details.forEach(item => {
+          rows.push({
+            NumeroViaggio: group.summary.ShipmentNumber,
+            Baia: group.summary.StagingAreaName,
+            Progress: group.summary.PalletPrevisti > 0
+              ? Math.round((group.summary.PalletConsegnati / group.summary.PalletPrevisti) * 100) + "%"
+              : "0%",
+            PalletConsegnati: group.summary.PalletConsegnati,
+            PalletPrevisti: group.summary.PalletPrevisti,
+            Errore: group.summary.FaultCodeDescription,
+            Priorità: group.summary.Priority,
+            ShipmentStatus: group.summary.ShipmentStatusDescription,
+            LPN: item.LPN,
+            SKU: item.Name_Item,
+            Descrizione: item.Description_Item,
+            Quantità: item.Quantity,
+            Lotto: item.Name_Lot,
+            DataStaging: item.StagedDateTime ? new Date(item.StagedDateTime).toLocaleString('it-IT') : ''
+          });
+        });
+      });
+      const worksheet = XLSX.utils.json_to_sheet(rows);
+      const workbook = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(workbook, worksheet, "Spedizioni Attive");
+      XLSX.writeFile(workbook, "spedizioni_attive.xlsx");
+    }
+
+    loadData();
+
+function openLpnPopup(lpn) {
+  const popupUrl = `dettaglio_popup.html?lpn=${encodeURIComponent(lpn)}`;
+  window.open(
+    popupUrl,
+    'popupLPN',
+    'width=500,height=700,scrollbars=yes,resizable=yes'
+  );
+}
+
+  </script>
+</body>
+</html>

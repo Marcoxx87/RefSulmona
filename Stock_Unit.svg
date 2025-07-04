@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 80" width="80" height="80">
+  <!-- sfondo chiaro -->
+  <rect width="80" height="80" fill="#e3f2fd"></rect>
+  
+  <!-- scatola grande -->
+  <rect x="15" y="30" width="50" height="35" rx="4" fill="#007bbd" stroke="#003366" stroke-width="2"></rect>
+  
+  <!-- linee orizzontali interne -->
+  <line x1="15" y1="45" x2="65" y2="45" stroke="#ffffff" stroke-width="2"></line>
+  
+  <!-- piccola scatola sopra -->
+  <rect x="25" y="15" width="30" height="15" rx="3" fill="#3BB9FF" stroke="#003366" stroke-width="2"></rect>
+  
+  <!-- scritta -->
+  <text x="40" y="72" font-size="10" fill="#003366" text-anchor="middle" font-family="Segoe UI, sans-serif">
+    Stock Unit
+  </text>
+</svg>
