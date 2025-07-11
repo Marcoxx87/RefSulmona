@@ -128,7 +128,7 @@
     }
 
     .bottom-links {
-      position: fixed;
+      : fixed;
       bottom: 10px;
       left: 0;
       right: 0;
@@ -159,7 +159,7 @@
     }
 
     .oee-button {
-      position: fixed;
+      : fixed;
       bottom: 55px;
       left: 50%;
       transform: translateX(-50%);
@@ -231,11 +231,13 @@
           badge.style.display = 'none';
         }
 
-        const searchString = "Position: (317051, 460352); Segment: 969; Point 755; BlockingId 0";
+     const searchString = "Position: (317051, 460352); Segment: 969; Point 755; BlockingId 0";
 
-        const carwashFull = data.some(row => {
-          const detail = String(row.AlarmDetails || "").trim().toLowerCase();
-          return detail.includes(searchString.trim().toLowerCase());
+const carwashFull = data.some(row => {
+  const detail = String(row.DettaglioFermata || row.Dettaglio || "").trim().toLowerCase();
+  return detail === searchString.trim().toLowerCase();
+});
+
         });
 
         const carwashBtn = document.getElementById('carwash-btn');
