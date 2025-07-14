@@ -4,12 +4,10 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Dashboard</title>
-
   <link rel="icon" href="refresco_logo.jpg" type="image/jpg">
   <link rel="apple-touch-icon" href="refresco_logo.jpg">
   <meta name="theme-color" content="#3BB9FF">
   <link rel="manifest" href="manifest.json">
-
   <style>
     body {
       font-family: "Segoe UI", sans-serif;
@@ -20,7 +18,6 @@
       min-height: 100vh;
       padding-bottom: 80px;
     }
-
     header {
       display: flex;
       flex-wrap: wrap;
@@ -30,7 +27,6 @@
       padding: 20px;
       background: linear-gradient(to right, #3BB9FF, #007bbd);
     }
-
     header h1 {
       margin: 0;
       font-size: 30px;
@@ -38,26 +34,19 @@
       text-align: center;
       flex-grow: 1;
     }
-
     .logo-container {
       background-color: white;
       padding: 6px 10px;
       border-radius: 8px;
       flex-shrink: 0;
     }
-
-    header img {
-      height: 45px;
-      object-fit: contain;
-    }
-
+    header img { height: 45px; object-fit: contain; }
     .container {
       max-width: 900px;
       margin: 30px auto;
       padding: 10px;
       text-align: center;
     }
-
     .btn-container {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
@@ -65,9 +54,9 @@
       justify-content: center;
       margin-top: 20px;
     }
-
     .nav-btn {
       display: flex;
+      flex-direction: column;
       justify-content: center;
       align-items: center;
       gap: 10px;
@@ -83,27 +72,12 @@
       transition: transform 0.2s, background-color 0.3s;
       box-shadow: 0 3px 6px rgba(0,0,0,0.2);
       min-height: 60px;
+      position: relative;
     }
-
-    .nav-btn.default {
-      background-color: #3BB9FF;
-    }
-
-    .nav-btn.default:hover {
-      background-color: #007bbd;
-      transform: translateY(-2px);
-    }
-
-    .blink-red {
-      animation: blinkRed 1s infinite;
-      background-color: #d32f2f !important;
-      color: #fff !important;
-    }
-
-    @keyframes blinkRed {
-      50% { background-color: #a80000; }
-    }
-
+    .nav-btn.default { background-color: #3BB9FF; }
+    .nav-btn.default:hover { background-color: #007bbd; transform: translateY(-2px);}
+    .blink-red { animation: blinkRed 1s infinite; background-color: #d32f2f !important; color: #fff !important; }
+    @keyframes blinkRed { 50% { background-color: #a80000; } }
     .badge {
       background-color: #ff5722;
       color: white;
@@ -114,7 +88,28 @@
       min-width: 24px;
       text-align: center;
     }
-
+    .crane-badge-list {
+      display: flex;
+      gap: 6px;
+      margin-top: 7px;
+      font-size: 14px;
+      flex-wrap: wrap;
+    }
+    .crane-badge {
+      padding: 2px 7px;
+      border-radius: 6px;
+      font-weight: bold;
+      color: #fff;
+      font-size: 14px;
+      min-width: 38px;
+      text-align: center;
+    }
+    .cr1 { background: #0099ee; }
+    .cr2 { background: #43a047; }
+    .cr3 { background: #fbc02d; color: #333;}
+    .cr4 { background: #e64a19; }
+    .cr5 { background: #7c4dff; }
+    .cr6 { background: #d32f2f; }
     .clock {
       font-size: 36px;
       font-weight: bold;
@@ -126,7 +121,6 @@
       box-shadow: 0 2px 6px rgba(0,0,0,0.15);
       margin-top: 40px;
     }
-
     .bottom-links {
       position: fixed;
       bottom: 10px;
@@ -137,7 +131,6 @@
       padding: 0 20px;
       pointer-events: none;
     }
-
     .bottom-links a {
       pointer-events: all;
       font-size: 12px;
@@ -152,12 +145,10 @@
       min-width: 60px;
       text-align: center;
     }
-
     .bottom-links a:hover {
       background-color: #007bbd;
       color: #fff;
     }
-
     .oee-button {
       position: fixed;
       bottom: 55px;
@@ -173,10 +164,7 @@
       box-shadow: 0 2px 4px rgba(0,0,0,0.2);
       transition: background-color 0.3s;
     }
-
-    .oee-button:hover {
-      background-color: #005c99;
-    }
+    .oee-button:hover { background-color: #005c99; }
   </style>
 </head>
 <body>
@@ -186,24 +174,28 @@
       <img src="refresco_logo.jpg" alt="Logo Refresco" />
     </div>
   </header>
-
   <div class="container">
     <div class="btn-container">
       <a href="fermate.html" id="fermate-btn" class="nav-btn default">
         Fermate Attive <span id="fermate-badge" class="badge" style="display: none;">0</span>
       </a>
       <a href="Carwash.html" id="carwash-btn" class="nav-btn default">Carwash</a>
-      <a href="Missioni_Incomplete.html" class="nav-btn default">Missioni Incomplete</a>
+      <a href="Missioni_incomplete.html" class="nav-btn default">Missioni Incomplete</a>
       <a href="Inventory.html" class="nav-btn default">Inventario</a>
-      <a href="Locazioni.html" class="nav-btn default">Locazioni Bloccate</a>
-      <a href="Shipment.html" class="nav-btn default">Spedizioni Attive</a>
-    </div>
 
+      <!-- NUOVO PULSANTE BILANCIAMENTO CRANE -->
+      <a href="BilanciamentoLottiCrane.html" id="crane-balance-btn" class="nav-btn default">
+        Bilanciamento Crane
+        <div id="crane-balance-perc" class="crane-badge-list" style="margin-top:6px; font-size:13px;"></div>
+      </a>
+
+      <a href="locazioni.html" class="nav-btn default">Locazioni Bloccate</a>
+      <a href="shipment.html" class="nav-btn default">Spedizioni Attive</a>
+    </div>
     <div id="clock" class="clock"></div>
   </div>
 
   <a href="https://80.21.24.216:594/OEEblueDashboard_Sulmona/PlantDashboard.aspx" class="oee-button" target="_blank">OEEBlue</a>
-
   <div class="bottom-links">
     <a href="https://refresco.sharepoint.com/sites/ITA-MFG-Action-Plan_Sulmona/Lists/Action%20Plan%20Sulmona/AllItems.aspx" target="_blank">Action Plan</a>
     <a href="https://refresco.sharepoint.com/sites/ITA-MFG-Action-Plan_Sulmona/Lists/Malfunzionamenti%20Magazzino/AllItems.aspx" target="_blank">Magazzino Automatico</a>
@@ -214,6 +206,36 @@
     const supabaseUrl = 'https://orttbxpxuohxfsqwrzcy.supabase.co';
     const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9ydHRieHB4dW9oeGZzcXdyemN5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA4NDAxMTksImV4cCI6MjA2NjQxNjExOX0.Lxe0r28sb4-JYRasIJJU13uq8sfiGSeNTeuWC98_wCs';
     const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+
+    // Badge colori come la tabella BilanciamentoLottiCrane
+    const crKeys = ['CR1','CR2','CR3','CR4','CR5','CR6'];
+    const crColors = ['cr1','cr2','cr3','cr4','cr5','cr6'];
+
+    async function loadCranePerc() {
+      let { data, error } = await supabase
+        .from('distribuzioni_crane')
+        .select('*');
+      if (error || !data) return;
+
+      // Somma e percentuali totali
+      let crTotals = [0,0,0,0,0,0];
+      let sumTot = 0;
+      data.forEach(row => {
+        crKeys.forEach((k, idx) => {
+          let val = Number(row[k]) || 0;
+          crTotals[idx] += val;
+        });
+        sumTot += crKeys.reduce((acc,k)=>acc+(Number(row[k])||0),0);
+      });
+      let crPerc = sumTot>0 ? crTotals.map(x=>x*100/sumTot) : [0,0,0,0,0,0];
+
+      // Mostra le percentuali nel badge del pulsante
+      let percHTML = '';
+      crPerc.forEach((p, idx) => {
+        percHTML += `<span class="crane-badge ${crColors[idx]}">${crKeys[idx]}: ${p.toFixed(1)}%</span>`;
+      });
+      document.getElementById('crane-balance-perc').innerHTML = percHTML;
+    }
 
     async function loadFermateCount() {
       const { count, error, data } = await supabase
@@ -230,15 +252,11 @@
         } else {
           badge.style.display = 'none';
         }
-
-        // Parziale
-        const partialString = "Segment: 969; Point 755";
-
+        const searchString = "Segment: 969; Point 755";
         const carwashFull = data.some(row => {
-          const detail = String(row.AlarmDetails || row.DettaglioFermata || "").toLowerCase();
-          return detail.includes(partialString.toLowerCase());
+          const detail = String(row.AlarmDetails || "").trim().toLowerCase();
+          return detail.includes(searchString.trim().toLowerCase());
         });
-
         const carwashBtn = document.getElementById('carwash-btn');
         if (carwashFull) {
           carwashBtn.classList.remove('default');
@@ -257,12 +275,15 @@
       const options = { hour: '2-digit', minute: '2-digit', second: '2-digit' };
       document.getElementById('clock').textContent = now.toLocaleTimeString('it-IT', options);
     }
-
     setInterval(updateClock, 1000);
     updateClock();
 
     loadFermateCount();
     setInterval(loadFermateCount, 30000);
+
+    loadCranePerc();
+    setInterval(loadCranePerc, 60000);
+
   </script>
 </body>
 </html>
