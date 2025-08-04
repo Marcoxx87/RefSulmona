@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Linee di Produzione</title>
+  <link rel="icon" href="stockunit_logo.jpg" type="image/jpg" />
+  <meta name="theme-color" content="#3BB9FF">
+  <link rel="manifest" href="manifest.json">
+  <style>
+    body {
+      font-family: "Segoe UI", sans-serif;
+      background-color: #fff;
+      color: #333;
+      margin: 0;
+      padding: 10px;
+    }
+
+    .top-bar {
+      display: flex;
+      justify-content: flex-end;
+      padding: 5px;
+    }
+
+    .top-bar img {
+      height: 30px;
+    }
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      margin-bottom: 20px;
+    }
+
+    .logo-title {
+      display: flex;
+      align-items: center;
+      flex: 1;
+    }
+
+    .logo-title img {
+      height: 40px;
+      margin-right: 15px;
+    }
+
+    .logo-title h1 {
+      font-size: 24px;
+      margin: 0;
+      color: #007bbd;
+      flex: 1;
+      text-align: center;
+    }
+
+    .controls {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .btn-home {
+      padding: 8px 12px;
+      border-radius: 6px;
+      border: none;
+      font-weight: bold;
+      cursor: pointer;
+      font-size: 14px;
+      background-color: #2196f3;
+      color: white;
+    }
+
+    .btn-home:hover {
+      background-color: #1976d2;
+    }
+
+	.btn-task {
+  padding: 8px 12px;
+  border-radius: 6px;
+  border: none;
+  font-weight: bold;
+  cursor: pointer;
+  font-size: 14px;
+  background-color: #ff9800;
+  color: white;
+  transition: background 0.2s;
+  text-decoration: none;
+  display: inline-block;
+}
+.btn-task:hover {
+  background-color: #fb8c00;
+}
+
+    .table-container {
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+      font-size: 13px;
+      background-color: #fff;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      min-width: 1100px;
+    }
+
+    th, td {
+      border: 1px solid #ccc;
+      padding: 8px;
+      text-align: left;
+      vertical-align: middle;
+    }
+
+    th {
+      background-color: #3BB9FF;
+      color: #fff;
+      text-transform: uppercase;
+    }
+
+    th:first-child, td:first-child {
+      min-width: 70px;
+      max-width: 80px;
+    }
+
+    tr:hover {
+      background-color: #d0ebff;
+    }
+
+    .details-row {
+      display: none;
+      padding: 0;
+    }
+
+    .details-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 5px;
+      margin-bottom: 5px;
+      table-layout: fixed;
+    }
+
+    .details-table th, .details-table td {
+      border: 1px solid #aaa;
+      padding: 6px;
+      font-size: 12px;
+      text-align: left;
+    }
+
+    /* PRODUZIONE TERMINATA: bordo e titolo VERDE */
+    .term-row th, .term-row td {
+      border: 2px solid #219653 !important;
+      background: #f9fff7 !important;
+      color: #222 !important;
+      font-weight: normal;
+    }
+    .term-title th {
+      background-color: #219653 !important;
+      color: #fff !important;
+      text-align: left;
+      font-size: 13px;
+      font-weight: bold;
+      border-color: #219653 !important;
+    }
+
+    /* PRODUZIONE SUCCESSIVA: bordo e titolo GIALLO SCURO */
+    .att-row th, .att-row td {
+      border: 2px solid #ffb300 !important;
+      background: #fffbea !important;
+      color: #222 !important;
+      font-weight: normal;
+    }
+    .att-title th {
+      background-color: #ffb300 !important;
+      color: #fff !important;
+      text-align: left;
+      font-size: 13px;
+      font-weight: bold;
+      border-color: #ffb300 !important;
+    }
+    .bold { font-weight: bold; }
+    .progress-bar-bg {
+      background-color: #eee;
+      border-radius: 12px;
+      height: 18px;
+      width: 100%;
+      position: relative;
+      margin-right: 8px;
+    }
+    .progress-bar-fill {
+      background: linear-gradient(90deg, #3BB9FF 60%, #4caf50 100%);
+      height: 100%;
+      border-radius: 12px;
+      transition: width 0.5s;
+    }
+    .progress-label {
+      position: absolute;
+      left: 50%;
+      top: 0;
+      transform: translateX(-50%);
+      font-size: 12px;
+      color: #222;
+      font-weight: bold;
+    }
+    #total-count {
+      margin-top: 10px;
+      font-weight: bold;
+    }
+    @media (max-width: 900px) {
+      .details-table th, .details-table td, th, td { font-size: 11px; padding: 4px; }
+      .logo-title h1 { font-size: 16px; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="top-bar">
+    <img src="stock_unit.svg" alt="Logo Stock Unit" />
+  </div>
+
+  <div class="header">
+    <div class="logo-title">
+      <img src="refresco_logo.jpg" alt="Logo Stock Unit" />
+      <h1>Linee di Produzione</h1>
+    </div>
+    <div class="controls">
+  <a href="index.html" class="btn-home">Home</a>
+  <a href="Task.html" class="btn-task">STATO TASK</a>
+</div>
+  </div>
+
+  <div class="table-container">
+    <table id="main-table" style="display: none;">
+      <thead>
+        <tr>
+          <th style="width:60px;">STATO</th>
+          <th>Linea</th>
+          <th>Data inizio</th>
+          <th>ODL</th>
+          <th>Codice</th>
+          <th>Descrizione prodotto</th>
+          <th>Lotto</th>
+          <th>Qta Preventivata</th>
+          <th>Qta in corso</th>
+        </tr>
+      </thead>
+      <tbody id="table-body"></tbody>
+    </table>
+  </div>
+
+  <div id="total-count"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    // Sostituisci con i tuoi valori reali!
+    const supabase = window.supabase.createClient(
+      'https://orttbxpxuohxfsqwrzcy.supabase.co',
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9ydHRieHB4dW9oeGZzcXdyemN5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA4NDAxMTksImV4cCI6MjA2NjQxNjExOX0.Lxe0r28sb4-JYRasIJJU13uq8sfiGSeNTeuWC98_wCs'
+    );
+
+    let fullData = [];
+
+    async function loadData() {
+      document.getElementById('main-table').style.display = 'none';
+      document.getElementById('table-body').innerHTML = '';
+      document.getElementById('total-count').innerText = "Caricamento dati...";
+
+      const { data, error } = await supabase
+        .from('t_linee_produzioni')
+        .select('*')
+        .order('DESC_LINEA', { ascending: true })
+        .limit(500);
+
+      if (error) {
+        document.getElementById('total-count').innerText = 'Errore: ' + error.message;
+        return;
+      }
+      fullData = data;
+      renderTable();
+    }
+
+    function renderTable() {
+      const tbody = document.getElementById('table-body');
+      tbody.innerHTML = '';
+      (fullData || []).forEach((row, idx) => {
+        // Calcola la percentuale di avanzamento (gestione casi limite)
+        let qtaPrev = parseFloat(row.QTA_PREV_RUN) || 0;
+        let qtaProd = parseFloat(row.QTA_PROD_RUN) || 0;
+        let percent = (qtaPrev > 0) ? Math.min((qtaProd / qtaPrev) * 100, 100) : 0;
+        let percentTxt = qtaPrev > 0 ? `${Math.round(percent)}%` : "n.d.";
+
+        // Data solo giorno
+        let dataInizioGiorno = row.DATA_INIZIO_RUN
+          ? new Date(row.DATA_INIZIO_RUN).toLocaleDateString('it-IT')
+          : '';
+
+        // RIGA PRINCIPALE
+        const tr = document.createElement('tr');
+        tr.style.cursor = "pointer";
+        tr.innerHTML = `
+          <td>
+            <div class="progress-bar-bg">
+              <div class="progress-bar-fill" style="width:${percent}%;"></div>
+              <span class="progress-label">${percentTxt}</span>
+            </div>
+          </td>
+          <td class="bold">${row.DESC_LINEA || ''}</td>
+          <td>${dataInizioGiorno}</td>
+          <td class="bold">${buildODL(row.ERP_ANNO_RUN, row.ERP_PDP_RUN, row.ERP_RIGA_PDP_RUN)}</td>
+          <td>${row.CD_MATERIALE_RUN || ''}</td>
+          <td>${row.DESC_PRODOTTO_RUN || ''}</td>
+          <td class="bold">${row.LOTTO_RUN || ''}</td>
+          <td class="bold">${formatNumber(row.QTA_PREV_RUN)}</td>
+          <td class="bold">${formatNumber(row.QTA_PROD_RUN)}</td>
+        `;
+
+        // RIGA DETTAGLIO
+        const detailRow = document.createElement('tr');
+        detailRow.classList.add('details-row');
+        detailRow.innerHTML = `<td colspan="9">${buildDetailsTable(row)}</td>`;
+
+        tr.addEventListener('click', () => {
+          detailRow.style.display = detailRow.style.display === 'table-row' ? 'none' : 'table-row';
+        });
+
+        tbody.appendChild(tr);
+        tbody.appendChild(detailRow);
+      });
+
+      document.getElementById('main-table').style.display = (fullData.length > 0) ? 'table' : 'none';
+      document.getElementById('total-count').innerText = `Totale record visualizzati: ${fullData.length}`;
+    }
+
+    // Restituisce la stringa ODL (ANNO-PDP-RIGA)
+    function buildODL(anno, pdp, riga) {
+      return `<span class="bold">${[anno,pdp,riga].filter(x=>x!==undefined&&x!==null).join('-')}</span>`;
+    }
+
+    // Righe dettagliate, colorate solo con bordo e titolo!
+    function buildDetailsTable(row) {
+      return `
+        <table class="details-table">
+          <thead>
+            <tr class="term-title"><th colspan="7">Produzione Terminata</th></tr>
+            <tr class="term-row">
+              <th>ODL</th>
+              <th>Codice</th>
+              <th>Descrizione prodotto</th>
+              <th>Lotto</th>
+              <th>Data fine</th>
+              <th>Qta Preventivata</th>
+              <th>Qta Prodotta</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="term-row">
+              <td class="bold">${buildODL(row.ERP_ANNO_TERM, row.ERP_PDP_TERM, row.ERP_RIGA_PDP_TERM)}</td>
+              <td>${row.CD_MATERIALE_TERM || ''}</td>
+              <td>${row.DESC_PRODOTTO_TERM || ''}</td>
+              <td class="bold">${row.LOTTO_TERM || ''}</td>
+              <td>${row.DATA_FINE_TERM ? new Date(row.DATA_FINE_TERM).toLocaleDateString('it-IT') : ''}</td>
+              <td class="bold">${formatNumber(row.QTA_PREV_TERM)}</td>
+              <td class="bold">${formatNumber(row.QTA_PROD_TERM)}</td>
+            </tr>
+          </tbody>
+          <thead>
+            <tr class="att-title"><th colspan="7">Produzione Successiva</th></tr>
+            <tr class="att-row">
+              <th>ODL</th>
+              <th>Codice</th>
+              <th>Descrizione prodotto</th>
+              <th>Data pianificata</th>
+              <th>Qta Preventivata</th>
+              <th></th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="att-row">
+              <td class="bold">${buildODL(row.ERP_ANNO_ATT, row.ERP_PDP_ATT, row.ERP_RIGA_PDP_ATT)}</td>
+              <td>${row.CD_MATERIALE_ATT || ''}</td>
+              <td>${row.DESC_PRODOTTO_ATT || ''}</td>
+              <td>${row.DATA_PIAN_ATT ? new Date(row.DATA_PIAN_ATT).toLocaleDateString('it-IT') : ''}</td>
+              <td class="bold">${formatNumber(row.QTA_PREV_ATT)}</td>
+              <td></td>
+              <td></td>
+            </tr>
+          </tbody>
+        </table>
+      `;
+    }
+
+    function formatNumber(num) {
+      return num !== undefined && num !== null && num !== '' && !isNaN(num)
+        ? Number(num).toLocaleString('it-IT')
+        : '';
+    }
+
+    loadData();
+  </script>
+</body>
+</html>

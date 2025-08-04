@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Task Magazzino</title>
+  <link rel="icon" href="stockunit_logo.jpg" type="image/jpg" />
+  <meta name="theme-color" content="#3BB9FF">
+  <link rel="manifest" href="manifest.json">
+  <style>
+    body {
+      font-family: "Segoe UI", sans-serif;
+      background-color: #fff;
+      color: #333;
+      margin: 0;
+      padding: 10px;
+    }
+    .top-bar {
+      display: flex;
+      justify-content: flex-end;
+      padding: 5px;
+    }
+    .top-bar img {
+      height: 30px;
+    }
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      margin-bottom: 20px;
+    }
+    .logo-title {
+      display: flex;
+      align-items: center;
+      flex: 1;
+    }
+    .logo-title img {
+      height: 40px;
+      margin-right: 15px;
+    }
+    .logo-title h1 {
+      font-size: 24px;
+      margin: 0;
+      color: #007bbd;
+      flex: 1;
+      text-align: center;
+    }
+    .controls {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .btn-home {
+      padding: 8px 12px;
+      border-radius: 6px;
+      border: none;
+      font-weight: bold;
+      cursor: pointer;
+      font-size: 14px;
+      background-color: #2196f3;
+      color: white;
+    }
+    .btn-home:hover {
+      background-color: #1976d2;
+    }
+    .table-container {
+      overflow-x: auto;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+      font-size: 13px;
+      background-color: #fff;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      min-width: 900px;
+    }
+    th, td {
+      border: 1px solid #ccc;
+      padding: 8px;
+      text-align: left;
+      vertical-align: middle;
+    }
+    th {
+      background-color: #3BB9FF;
+      color: #fff;
+      text-transform: uppercase;
+    }
+    tr.red-alert {
+      background-color: #ffcccc !important;
+      color: #b71c1c !important;
+    }
+    tr:hover {
+      background-color: #d0ebff;
+    }
+    .autostart-yes {
+      background: #c6f6d5;
+      color: #22753e;
+      font-weight: bold;
+      padding: 4px 8px;
+      border-radius: 6px;
+      display: inline-block;
+      text-align: center;
+    }
+    .autostart-no {
+      background: #ffecb3;
+      color: #997a00;
+      font-weight: bold;
+      padding: 4px 8px;
+      border-radius: 6px;
+      display: inline-block;
+      text-align: center;
+    }
+.bold { font-weight: bold; }
+    #total-count {
+      margin-top: 10px;
+      font-weight: bold;
+    }
+    @media (max-width: 900px) {
+      th, td { font-size: 11px; padding: 4px; }
+      .logo-title h1 { font-size: 16px; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="top-bar">
+    <img src="stock_unit.svg" alt="Logo Stock Unit" />
+  </div>
+
+  <div class="header">
+    <div class="logo-title">
+      <img src="refresco_logo.jpg" alt="Logo Stock Unit" />
+      <h1>Task Magazzino</h1>
+    </div>
+    <div class="controls">
+      <a href="index.html" class="btn-home">Home</a>
+    </div>
+  </div>
+
+  <div class="table-container">
+    <table id="main-table" style="display: none;">
+      <thead>
+        <tr>
+          <th>Task</th>
+          <th>Stato</th>
+          <th>Ultimo Aggiornamento</th>
+          <th>Durata (s)</th>
+          <th>Errori</th>
+          <th>Attivazione</th>
+          <th>Autostart</th>
+        </tr>
+      </thead>
+      <tbody id="table-body"></tbody>
+    </table>
+  </div>
+
+  <div id="total-count"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    const supabase = window.supabase.createClient(
+      'https://orttbxpxuohxfsqwrzcy.supabase.co',
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9ydHRieHB4dW9oeGZzcXdyemN5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA4NDAxMTksImV4cCI6MjA2NjQxNjExOX0.Lxe0r28sb4-JYRasIJJU13uq8sfiGSeNTeuWC98_wCs'
+    );
+
+    let fullData = [];
+
+    async function loadData() {
+      document.getElementById('main-table').style.display = 'none';
+      document.getElementById('table-body').innerHTML = '';
+      document.getElementById('total-count').innerText = "Caricamento dati...";
+
+      const { data, error } = await supabase
+        .from('stato_task_magazzino')
+        .select('*')
+        .order('UltimoAggiornamento', { ascending: false })
+        .limit(500);
+
+      if (error) {
+        document.getElementById('total-count').innerText = 'Errore: ' + error.message;
+        return;
+      }
+      fullData = data;
+      renderTable();
+    }
+
+    function renderTable() {
+      const tbody = document.getElementById('table-body');
+      tbody.innerHTML = '';
+      const now = new Date();
+
+      (fullData || []).forEach((row) => {
+        let ultimoAgg = row.UltimoAggiornamento ? new Date(row.UltimoAggiornamento) : null;
+        let attivazione = row.AttivazioneTask ? new Date(row.AttivazioneTask) : null;
+
+        // Se mancano i dati la riga resta normale
+        let diffMin = ultimoAgg ? (now - ultimoAgg) / 60000 : 0;
+        let isAlert = diffMin > 10;
+
+        const tr = document.createElement('tr');
+        if (isAlert) tr.classList.add('red-alert');
+        tr.innerHTML = `
+          <td class="bold">${row.DescrizioneTask || ''}</td>
+          <td>${row.Stato || ''}</td>
+          <td class="bold">${ultimoAgg ? ultimoAgg.toLocaleString('it-IT') : ''}</td>
+          <td>${row.Durata !== null && row.Durata !== undefined ? row.Durata : ''}</td>
+          <td>${row.ErroriCounter !== null && row.ErroriCounter !== undefined ? row.ErroriCounter : ''}</td>
+          <td>${attivazione ? attivazione.toLocaleString('it-IT') : ''}</td>
+          <td>
+            ${row.AUTOSTART ? 
+              '<span class="autostart-yes">Sì</span>' :
+              '<span class="autostart-no">No</span>'}
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+
+      document.getElementById('main-table').style.display = (fullData.length > 0) ? 'table' : 'none';
+      document.getElementById('total-count').innerText = `Totale task visualizzati: ${fullData.length}`;
+    }
+
+    loadData();
+  </script>
+</body>
+</html>
